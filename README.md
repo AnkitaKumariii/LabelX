@@ -192,8 +192,3 @@ LabelX/
             └── AgentProgress.jsx # Live progress panel
 ```
 
----
-
-## 📄 License
-
-MIT — see [LICENSE](LICENSE)
