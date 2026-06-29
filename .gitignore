@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.venv/
+venv/
+ENV/
+env/
+
+# Environment
+.env
+.env.local
+.env.production
+backend/.env
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+.npm
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# Qdrant local data
+qdrant_storage/
+
+# Redis dump
+dump.rdb
+
+# Uploads temp
+backend/uploads/
+
+# Test
+.pytest_cache/
+.coverage
+htmlcov/

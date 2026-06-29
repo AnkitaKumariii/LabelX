@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base Reset & Fonts ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 15% 40%, rgba(121, 40, 202, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(0, 212, 255, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 90%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: rgba(121, 40, 202, 0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(121, 40, 202, 0.5); }
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+::selection { background: rgba(121, 40, 202, 0.2); color: #0f172a; }
+
+/* ── Glass Card ──────────────────────────────────────────────────────────── */
+@layer components {
+  .glass {
+    @apply bg-white/70 border border-slate-200/60 backdrop-blur-xl rounded-2xl shadow-sm;
+  }
+
+  .glass-hover {
+    @apply glass transition-all duration-300 hover:bg-white/90 hover:border-slate-300 hover:shadow-md hover:shadow-brand-purple/5;
+  }
+
+  .glass-strong {
+    @apply bg-white/90 border border-slate-200 backdrop-blur-2xl rounded-2xl shadow-sm;
+  }
+
+  /* ── Gradient Text ─────────────────────────────────────────────────────── */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #00b0d4, #7928ca, #d4006a); /* Slightly darker for contrast */
+  }
+
+  .gradient-text-green {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #00c76a, #00b0d4);
+  }
+
+  /* ── Glow Buttons ──────────────────────────────────────────────────────── */
+  .btn-primary {
+    @apply relative px-8 py-3 rounded-xl font-semibold text-white transition-all duration-300
+           bg-gradient-to-r from-brand-purple to-[#00b0d4]
+           hover:shadow-lg hover:shadow-brand-purple/20 hover:scale-[1.02]
+           active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-xl font-medium text-slate-600 glass-hover border border-slate-200
+           hover:text-slate-900 transition-all duration-300;
+  }
+
+  .btn-danger {
+    @apply px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300
+           bg-gradient-to-r from-brand-red to-brand-pink
+           hover:shadow-lg hover:shadow-brand-red/20 hover:scale-[1.02];
+  }
+
+  /* ── Input Fields ──────────────────────────────────────────────────────── */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl bg-white text-slate-900 placeholder-slate-400
+           border border-slate-200 focus:border-brand-cyan/50 focus:outline-none
+           focus:ring-2 focus:ring-brand-cyan/20 transition-all duration-200 shadow-sm;
+  }
+
+  .textarea-field {
+    @apply input-field resize-none;
+  }
+
+  /* ── Badge Colors ──────────────────────────────────────────────────────── */
+  .badge-safe {
+    @apply bg-brand-green/10 border border-brand-green/30 text-emerald-600;
+  }
+  .badge-caution {
+    @apply bg-brand-yellow/15 border border-brand-yellow/40 text-amber-600;
+  }
+  .badge-harmful {
+    @apply bg-brand-red/10 border border-brand-red/30 text-rose-600;
+  }
+  .badge-unknown {
+    @apply bg-slate-100 border border-slate-200 text-slate-500;
+  }
+
+  /* ── Section Headers ───────────────────────────────────────────────────── */
+  .section-label {
+    @apply text-xs uppercase tracking-widest text-slate-400 font-semibold;
+  }
+
+  /* ── Neon Glow Ring ────────────────────────────────────────────────────── */
+  .ring-cyan { box-shadow: 0 0 0 1px rgba(0, 176, 212, 0.4), 0 0 15px rgba(0, 176, 212, 0.1); }
+  .ring-purple { box-shadow: 0 0 0 1px rgba(121, 40, 202, 0.4), 0 0 15px rgba(121, 40, 202, 0.1); }
+  .ring-green { box-shadow: 0 0 0 1px rgba(0, 199, 106, 0.4), 0 0 15px rgba(0, 199, 106, 0.1); }
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% auto;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+.pulse-ring { animation: pulse-ring 2.5s ease-in-out infinite; }
+
+@keyframes progress-fill {
+  from { width: 0%; }
+  to { width: var(--target-width); }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.count-up { animation: count-up 0.6s ease-out forwards; }
+
+/* ── Gauge SVG ───────────────────────────────────────────────────────────── */
+.gauge-track { stroke: rgba(0,0,0,0.06); }
+.gauge-fill  { transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1); }
+
+/* ── Agent Progress Steps ────────────────────────────────────────────────── */
+.agent-step-active { border-color: rgba(0, 176, 212, 0.4); background: rgba(0, 212, 255, 0.05); }
+.agent-step-done   { border-color: rgba(0, 199, 106, 0.4); background: rgba(0, 255, 136, 0.05); }
+.agent-step-idle   { border-color: rgba(0, 0, 0, 0.08); }
+
+/* ── Drag & Drop Upload ──────────────────────────────────────────────────── */
+.upload-zone {
+  border: 2px dashed rgba(121, 40, 202, 0.2);
+  transition: all 0.3s ease;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: rgba(0, 176, 212, 0.6);
+  background: rgba(0, 212, 255, 0.03);
+}
+
+/* ── Typewriter cursor ───────────────────────────────────────────────────── */
+.typewriter::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Page transitions ────────────────────────────────────────────────────── */
+.page-enter {
+  animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Tooltip ─────────────────────────────────────────────────────────────── */
+.tooltip {
+  @apply absolute z-50 px-3 py-2 text-xs text-slate-800 glass rounded-lg pointer-events-none
+         opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap;
+}
