@@ -10,12 +10,37 @@ logger = logging.getLogger(__name__)
 _model = None
 
 
+import asyncio
+from google.api_core import exceptions
+
 def get_model():
     global _model
     if _model is None:
         genai.configure(api_key=os.getenv("GEMINI_API_KEY", ""))
         _model = genai.GenerativeModel("gemini-3.1-flash-lite")
     return _model
+
+
+async def _safe_generate(model, prompt, max_retries=3):
+    """Wraps Gemini API calls with rate-limit retry logic."""
+    for attempt in range(max_retries):
+        try:
+            return await model.generate_content_async(prompt)
+        except exceptions.ResourceExhausted as e:
+            if attempt == max_retries - 1:
+                raise e
+            wait_time = 35 + (attempt * 10)
+            logger.warning(f"Gemini Rate Limit (429) hit. Waiting {wait_time}s before retry {attempt+1}/{max_retries}...")
+            await asyncio.sleep(wait_time)
+        except Exception as e:
+            if "429" in str(e) or "Quota exceeded" in str(e):
+                if attempt == max_retries - 1:
+                    raise e
+                wait_time = 35 + (attempt * 10)
+                logger.warning(f"Gemini Rate Limit hit. Waiting {wait_time}s before retry {attempt+1}/{max_retries}...")
+                await asyncio.sleep(wait_time)
+            else:
+                raise e
 
 
 async def parse_ingredients_from_text(raw_text: str) -> List[str]:
@@ -33,7 +58,7 @@ Raw text:
 
 Respond with ONLY a valid JSON array, example: ["Water", "Sugar", "Salt"]"""
 
-    response = model.generate_content(prompt)
+    response = await _safe_generate(model, prompt)
     raw = response.text.strip()
     # Clean markdown code fences if present
     if raw.startswith("```"):
@@ -80,7 +105,7 @@ Return a JSON object with exactly these fields:
 If data is insufficient, use "unknown" for safety_rating and empty arrays.
 Respond with ONLY the JSON object."""
 
-    response = model.generate_content(prompt)
+    response = await _safe_generate(model, prompt)
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
@@ -207,7 +232,7 @@ SCORING RULES:
 Ensure ALL {len(ingredients)} ingredients are covered. Flag ALL user allergens if present.
 Respond with ONLY the JSON object, no markdown."""
 
-    response = model.generate_content(prompt)
+    response = await _safe_generate(model, prompt)
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
@@ -235,7 +260,7 @@ Respond with ONLY a JSON object:
   "is_food": true/false,
   "reason": "Brief explanation if false, otherwise empty string"
 }}"""
-    response = model.generate_content(prompt)
+    response = await _safe_generate(model, prompt)
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
@@ -296,7 +321,7 @@ Respond with ONLY a JSON object exactly like this:
   "failures": ["If any gate is false, list the specific reason why it failed here"]
 }}"""
 
-    response = model.generate_content(prompt)
+    response = await _safe_generate(model, prompt)
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]

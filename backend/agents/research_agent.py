@@ -77,16 +77,16 @@ async def research_node(state: AnalysisState) -> AnalysisState:
 
             if tavily_client:
                 try:
-                    if hasattr(tavily_client, 'search'):
-                        # Sync client requires to_thread
-                        search_resp = await asyncio.to_thread(
-                            tavily_client.search,
+                    if isinstance(tavily_client, AsyncTavilyClient):
+                        search_resp = await tavily_client.search(
                             query=f'food additive "{ingredient}" health effects safety',
                             max_results=3,
                             search_depth="basic",
                         )
                     else:
-                        search_resp = await tavily_client.search(
+                        # Sync client requires to_thread
+                        search_resp = await asyncio.to_thread(
+                            tavily_client.search,
                             query=f'food additive "{ingredient}" health effects safety',
                             max_results=3,
                             search_depth="basic",

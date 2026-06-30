@@ -10,31 +10,59 @@ _redis_client: Optional[aioredis.Redis] = None
 
 class MockRedis:
     def __init__(self):
+        self.file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.redis_mock.json')
         self.data = {}
         self.lists = {}
+        self._load()
+
+    def _load(self):
+        if os.path.exists(self.file_path):
+            try:
+                with open(self.file_path, 'r', encoding='utf-8') as f:
+                    content = json.load(f)
+                    self.data = content.get('data', {})
+                    self.lists = content.get('lists', {})
+            except Exception:
+                pass
+
+    def _save(self):
+        try:
+            with open(self.file_path, 'w', encoding='utf-8') as f:
+                json.dump({'data': self.data, 'lists': self.lists}, f)
+        except Exception:
+            pass
 
     async def set(self, key, value, ex=None):
+        self._load()
         self.data[key] = value
+        self._save()
 
     async def get(self, key):
+        self._load()
         return self.data.get(key)
 
     async def delete(self, key):
+        self._load()
         if key in self.data:
             del self.data[key]
+            self._save()
 
     async def lpush(self, key, *values):
+        self._load()
         if key not in self.lists:
             self.lists[key] = []
         for v in values:
             self.lists[key].insert(0, v)
+        self._save()
 
     async def ltrim(self, key, start, end):
+        self._load()
         if key in self.lists:
-            # redis ltrim is inclusive, start=0, end=49 -> slices [:50]
             self.lists[key] = self.lists[key][start:end+1]
+            self._save()
 
     async def lrange(self, key, start, end):
+        self._load()
         if key in self.lists:
             if end == -1:
                 return self.lists[key][start:]
