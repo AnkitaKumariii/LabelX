@@ -189,13 +189,13 @@ LabelX/
 └── frontend/
     └── src/
         ├── pages/
-        │   ├── ProfileSetup.jsx  # 3-step profile wizard
-        │   ├── Analyze.jsx       # Ingredient input + live SSE
-        │   └── Results.jsx       # Report with gauge & badges
+        │   ├── ProfileSetup.tsx  # 3-step profile wizard
+        │   ├── Analyze.tsx       # Ingredient input + live SSE
+        │   └── Results.tsx       # Report with gauge & badges
         └── components/
-            ├── HealthGauge.jsx   # Animated SVG gauge
-            ├── IngredientBadge.jsx # Expandable color badge
-            ├── SummaryCard.jsx   # Stat cards
-            └── AgentProgress.jsx # Live progress panel
+            ├── HealthGauge.tsx   # Animated SVG gauge
+            ├── IngredientBadge.tsx # Expandable color badge
+            ├── SummaryCard.tsx   # Stat cards
+            └── AgentProgress.tsx # Live progress panel
 ```
 
