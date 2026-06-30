@@ -46,6 +46,7 @@ qdrant_storage/
 
 # Redis dump
 dump.rdb
+backend/.redis_mock.json
 
 # Uploads temp
 backend/uploads/
