@@ -114,7 +114,7 @@ export default function Analyze() {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm text-brand-purple/80 mb-6 border border-brand-purple/20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm text-brand-brown/80 mb-6 border border-brand-brown/20">
             <span>🔬</span> Multi-agent AI analysis
           </div>
           <h1 className="font-display font-bold text-4xl sm:text-5xl mb-4">
@@ -143,7 +143,7 @@ e.g. Water, Sugar, High Fructose Corn Syrup, Citric Acid, Natural Flavors, Sodiu
               <button
                 id="btn-use-sample"
                 onClick={() => setText(SAMPLE_INGREDIENTS)}
-                className="text-xs text-brand-cyan/70 hover:text-brand-cyan underline underline-offset-2 transition-colors"
+                className="text-xs text-brand-blue/70 hover:text-brand-blue underline underline-offset-2 transition-colors"
                 disabled={analyzing}
               >
                 Use sample ingredients →
@@ -193,7 +193,7 @@ e.g. Water, Sugar, High Fructose Corn Syrup, Citric Acid, Natural Flavors, Sodiu
                   <div className="text-5xl animate-float">📸</div>
                   <p className="text-slate-500 text-sm">Drag & drop or click to upload</p>
                   <p className="text-slate-400 text-xs">PNG, JPG, WEBP — max 10MB</p>
-                  <p className="text-brand-cyan/60 text-xs">OCR will extract ingredient text automatically</p>
+                  <p className="text-brand-blue/60 text-xs">OCR will extract ingredient text automatically</p>
                 </div>
               )}
             </div>
@@ -233,7 +233,7 @@ e.g. Water, Sugar, High Fructose Corn Syrup, Citric Acid, Natural Flavors, Sodiu
         {analyzing && (
           <div className="glass rounded-2xl p-6 space-y-4 animate-fade-in">
             <h3 className="font-display font-semibold text-lg flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
               Live Agent Progress
             </h3>
             <AgentProgress events={events} currentAgent={currentAgent} progress={progress} />

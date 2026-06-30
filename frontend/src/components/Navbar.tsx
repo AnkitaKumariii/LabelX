@@ -14,7 +14,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/profile" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-purple to-brand-cyan flex items-center justify-center shadow-lg shadow-brand-purple/30 group-hover:shadow-brand-cyan/40 transition-shadow">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-blue to-brand-black flex items-center justify-center shadow-lg shadow-brand-brown/30 group-hover:shadow-brand-blue/40 transition-shadow">
             <span className="text-white font-bold text-sm">LX</span>
           </div>
           <span className="font-display font-bold text-lg tracking-tight">
@@ -34,14 +34,14 @@ export default function Navbar() {
                 id={`nav-step-${i + 1}`}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200
                   ${isActive
-                    ? 'bg-brand-purple/10 text-brand-cyan border border-brand-purple/20'
+                    ? 'bg-brand-brown/10 text-brand-blue border border-brand-brown/20'
                     : isPast
                     ? 'text-slate-500 hover:text-slate-800'
                     : 'text-slate-400 hover:text-slate-600'
                   }`}
               >
                 <span className={`w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold
-                  ${isActive ? 'bg-brand-cyan text-slate-900' : isPast ? 'bg-slate-200 text-slate-700' : 'bg-slate-100 text-slate-400'}`}>
+                  ${isActive ? 'bg-brand-blue text-slate-900' : isPast ? 'bg-slate-200 text-slate-700' : 'bg-slate-100 text-slate-400'}`}>
                   {isPast ? '✓' : step.label}
                 </span>
                 {step.title}

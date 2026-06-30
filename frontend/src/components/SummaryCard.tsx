@@ -1,6 +1,6 @@
 export default function SummaryCard({ icon, title, value, subtitle, color = 'cyan', size = 'normal' }) {
   const colorMap = {
-    cyan:   { text: 'text-brand-cyan',   bg: 'bg-brand-cyan/10',   border: 'border-brand-cyan/20',   glow: 'shadow-brand-cyan/10' },
+    cyan:   { text: 'text-brand-blue',   bg: 'bg-brand-blue/10',   border: 'border-brand-blue/20',   glow: 'shadow-brand-blue/10' },
     green:  { text: 'text-brand-green',  bg: 'bg-brand-green/10',  border: 'border-brand-green/20',  glow: 'shadow-brand-green/10' },
     yellow: { text: 'text-brand-yellow', bg: 'bg-brand-yellow/10', border: 'border-brand-yellow/20', glow: 'shadow-brand-yellow/10' },
     red:    { text: 'text-brand-red',    bg: 'bg-brand-red/10',    border: 'border-brand-red/20',    glow: 'shadow-brand-red/10' },

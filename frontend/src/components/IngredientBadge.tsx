@@ -46,9 +46,9 @@ export default function IngredientBadge({ ingredient, expanded = false, onClick 
           <p className="text-sm text-slate-600 leading-relaxed">{ingredient.explanation}</p>
 
           {ingredient.personalized_note && (
-            <div className="flex items-start gap-2 p-2.5 rounded-lg bg-brand-cyan/8 border border-brand-cyan/20">
-              <span className="text-brand-cyan text-sm mt-0.5">⚡</span>
-              <p className="text-sm text-brand-cyan/90 leading-relaxed">{ingredient.personalized_note}</p>
+            <div className="flex items-start gap-2 p-2.5 rounded-lg bg-brand-blue/8 border border-brand-blue/20">
+              <span className="text-brand-blue text-sm mt-0.5">⚡</span>
+              <p className="text-sm text-brand-blue/90 leading-relaxed">{ingredient.personalized_note}</p>
             </div>
           )}
 

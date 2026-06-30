@@ -94,7 +94,7 @@ export default function ProfileSetup() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm text-brand-cyan mb-6 border border-brand-cyan/20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm text-brand-blue mb-6 border border-brand-blue/20">
             <span>✨</span> Set up your health profile
           </div>
           <h1 className="font-display font-bold text-4xl sm:text-5xl mb-4">
@@ -112,13 +112,13 @@ export default function ProfileSetup() {
               <button
                 onClick={() => step > s && setStep(s)}
                 className={`w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center transition-all
-                  ${step === s ? 'bg-brand-cyan text-black scale-110' :
+                  ${step === s ? 'bg-brand-blue text-black scale-110' :
                     step > s ? 'bg-brand-green/30 text-brand-green border border-brand-green/40' :
                     'bg-slate-100 text-slate-400'}`}
               >
                 {step > s ? '✓' : s}
               </button>
-              {s < 3 && <div className={`w-12 h-0.5 rounded ${step > s ? 'bg-brand-cyan/50' : 'bg-slate-100'}`} />}
+              {s < 3 && <div className={`w-12 h-0.5 rounded ${step > s ? 'bg-brand-blue/50' : 'bg-slate-100'}`} />}
             </div>
           ))}
         </div>
@@ -153,7 +153,7 @@ export default function ProfileSetup() {
                     onClick={() => setForm(f => ({ ...f, expertise_level: level }))}
                     className={`p-5 rounded-xl border text-left transition-all duration-200
                       ${form.expertise_level === level
-                        ? 'border-brand-cyan/60 bg-brand-cyan/10 ring-1 ring-brand-cyan/30'
+                        ? 'border-brand-blue/60 bg-brand-blue/10 ring-1 ring-brand-blue/30'
                         : 'border-slate-200 glass hover:border-slate-300'}`}
                   >
                     <div className="text-2xl mb-2">{level === 'beginner' ? '🌱' : '🔬'}</div>
@@ -195,7 +195,7 @@ export default function ProfileSetup() {
                   onClick={() => toggleCondition(cond.id)}
                   className={`p-4 rounded-xl border text-left transition-all duration-200 group
                     ${form.health_conditions.includes(cond.id)
-                      ? 'border-brand-purple/60 bg-brand-purple/10'
+                      ? 'border-brand-brown/60 bg-brand-brown/10'
                       : 'border-slate-200 glass hover:border-slate-300'}`}
                 >
                   <div className="flex items-start gap-3">
@@ -206,7 +206,7 @@ export default function ProfileSetup() {
                     </div>
                     <div className={`shrink-0 ml-auto w-5 h-5 rounded-full border flex items-center justify-center
                       ${form.health_conditions.includes(cond.id)
-                        ? 'bg-brand-purple border-brand-purple text-slate-900 text-xs'
+                        ? 'bg-brand-brown border-brand-brown text-slate-900 text-xs'
                         : 'border-slate-300'}`}>
                       {form.health_conditions.includes(cond.id) && '✓'}
                     </div>
@@ -322,7 +322,7 @@ export default function ProfileSetup() {
           <div className="mt-6 glass rounded-xl p-4 flex flex-wrap gap-2">
             <span className="section-label self-center mr-1">Active:</span>
             {form.health_conditions.map(c => (
-              <span key={c} className="px-2 py-1 rounded-lg bg-brand-purple/15 border border-brand-purple/25 text-xs text-purple-300 capitalize">{c}</span>
+              <span key={c} className="px-2 py-1 rounded-lg bg-brand-brown/15 border border-brand-brown/25 text-xs text-amber-700 capitalize">{c}</span>
             ))}
             {form.allergies.map(a => (
               <span key={a} className="px-2 py-1 rounded-lg badge-harmful text-xs border capitalize">{a} allergy</span>

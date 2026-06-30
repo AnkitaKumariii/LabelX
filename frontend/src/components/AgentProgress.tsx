@@ -32,7 +32,7 @@ export default function AgentProgress({ events = [], currentAgent = null, progre
         </div>
         <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-brand-purple to-brand-cyan transition-all duration-500"
+            className="h-full rounded-full bg-gradient-to-r from-brand-blue to-brand-black transition-all duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -54,7 +54,7 @@ export default function AgentProgress({ events = [], currentAgent = null, progre
               `}
             >
               {isActive && (
-                <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-brand-cyan animate-pulse" />
+                <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-brand-blue animate-pulse" />
               )}
               {isDone && (
                 <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-brand-green" />

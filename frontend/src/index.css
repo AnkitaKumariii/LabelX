@@ -20,20 +20,20 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-image:
-    radial-gradient(ellipse at 15% 40%, rgba(121, 40, 202, 0.05) 0%, transparent 55%),
-    radial-gradient(ellipse at 85% 15%, rgba(0, 212, 255, 0.05) 0%, transparent 55%),
-    radial-gradient(ellipse at 50% 90%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+    radial-gradient(ellipse at 15% 40%, rgba(29, 78, 216, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 15%, rgba(133, 77, 14, 0.04) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 90%, rgba(15, 23, 42, 0.04) 0%, transparent 50%);
   background-attachment: fixed;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: rgba(121, 40, 202, 0.3); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(121, 40, 202, 0.5); }
+::-webkit-scrollbar-thumb { background: rgba(29, 78, 216, 0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(29, 78, 216, 0.5); }
 
 /* ── Selection ───────────────────────────────────────────────────────────── */
-::selection { background: rgba(121, 40, 202, 0.2); color: #0f172a; }
+::selection { background: rgba(29, 78, 216, 0.2); color: #0f172a; }
 
 /* ── Glass Card ──────────────────────────────────────────────────────────── */
 @layer components {
@@ -42,7 +42,7 @@ body {
   }
 
   .glass-hover {
-    @apply glass transition-all duration-300 hover:bg-white/90 hover:border-slate-300 hover:shadow-md hover:shadow-brand-purple/5;
+    @apply glass transition-all duration-300 hover:bg-white/90 hover:border-slate-300 hover:shadow-md hover:shadow-brand-blue/5;
   }
 
   .glass-strong {
@@ -52,19 +52,19 @@ body {
   /* ── Gradient Text ─────────────────────────────────────────────────────── */
   .gradient-text {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #00b0d4, #7928ca, #d4006a); /* Slightly darker for contrast */
+    background-image: linear-gradient(135deg, #1d4ed8, #0f172a);
   }
 
   .gradient-text-green {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #00c76a, #00b0d4);
+    background-image: linear-gradient(135deg, #10b981, #1d4ed8);
   }
 
   /* ── Glow Buttons ──────────────────────────────────────────────────────── */
   .btn-primary {
     @apply relative px-8 py-3 rounded-xl font-semibold text-white transition-all duration-300
-           bg-gradient-to-r from-brand-purple to-[#00b0d4]
-           hover:shadow-lg hover:shadow-brand-purple/20 hover:scale-[1.02]
+           bg-gradient-to-r from-brand-blue to-brand-black
+           hover:shadow-lg hover:shadow-brand-blue/20 hover:scale-[1.02]
            active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
 
@@ -75,15 +75,15 @@ body {
 
   .btn-danger {
     @apply px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300
-           bg-gradient-to-r from-brand-red to-brand-pink
+           bg-gradient-to-r from-brand-brown to-brand-red
            hover:shadow-lg hover:shadow-brand-red/20 hover:scale-[1.02];
   }
 
   /* ── Input Fields ──────────────────────────────────────────────────────── */
   .input-field {
     @apply w-full px-4 py-3 rounded-xl bg-white text-slate-900 placeholder-slate-400
-           border border-slate-200 focus:border-brand-cyan/50 focus:outline-none
-           focus:ring-2 focus:ring-brand-cyan/20 transition-all duration-200 shadow-sm;
+           border border-slate-200 focus:border-brand-blue/50 focus:outline-none
+           focus:ring-2 focus:ring-brand-blue/20 transition-all duration-200 shadow-sm;
   }
 
   .textarea-field {
@@ -110,9 +110,9 @@ body {
   }
 
   /* ── Neon Glow Ring ────────────────────────────────────────────────────── */
-  .ring-cyan { box-shadow: 0 0 0 1px rgba(0, 176, 212, 0.4), 0 0 15px rgba(0, 176, 212, 0.1); }
-  .ring-purple { box-shadow: 0 0 0 1px rgba(121, 40, 202, 0.4), 0 0 15px rgba(121, 40, 202, 0.1); }
-  .ring-green { box-shadow: 0 0 0 1px rgba(0, 199, 106, 0.4), 0 0 15px rgba(0, 199, 106, 0.1); }
+  .ring-blue { box-shadow: 0 0 0 1px rgba(29, 78, 216, 0.4), 0 0 15px rgba(29, 78, 216, 0.1); }
+  .ring-brown { box-shadow: 0 0 0 1px rgba(133, 77, 14, 0.4), 0 0 15px rgba(133, 77, 14, 0.1); }
+  .ring-green { box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.4), 0 0 15px rgba(16, 185, 129, 0.1); }
 }
 
 /* ── Animations ──────────────────────────────────────────────────────────── */
@@ -153,18 +153,18 @@ body {
 .gauge-fill  { transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1); }
 
 /* ── Agent Progress Steps ────────────────────────────────────────────────── */
-.agent-step-active { border-color: rgba(0, 176, 212, 0.4); background: rgba(0, 212, 255, 0.05); }
-.agent-step-done   { border-color: rgba(0, 199, 106, 0.4); background: rgba(0, 255, 136, 0.05); }
+.agent-step-active { border-color: rgba(29, 78, 216, 0.4); background: rgba(29, 78, 216, 0.05); }
+.agent-step-done   { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.05); }
 .agent-step-idle   { border-color: rgba(0, 0, 0, 0.08); }
 
 /* ── Drag & Drop Upload ──────────────────────────────────────────────────── */
 .upload-zone {
-  border: 2px dashed rgba(121, 40, 202, 0.2);
+  border: 2px dashed rgba(29, 78, 216, 0.2);
   transition: all 0.3s ease;
 }
 .upload-zone:hover, .upload-zone.drag-over {
-  border-color: rgba(0, 176, 212, 0.6);
-  background: rgba(0, 212, 255, 0.03);
+  border-color: rgba(29, 78, 216, 0.6);
+  background: rgba(29, 78, 216, 0.03);
 }
 
 /* ── Typewriter cursor ───────────────────────────────────────────────────── */
