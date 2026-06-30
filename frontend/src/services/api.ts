@@ -51,6 +51,10 @@ export async function* streamAnalysis(profileId, ingredients, rawText = null) {
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
+    if (response.status === 404 && err.detail?.includes('Profile not found')) {
+      localStorage.removeItem('labelx_profile_id')
+      window.location.href = '/profile'
+    }
     throw new Error(err.detail || `Server error: ${response.status}`)
   }
 
@@ -96,6 +100,10 @@ export async function* streamImageAnalysis(profileId, imageFile) {
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
+    if (response.status === 404 && err.detail?.includes('Profile not found')) {
+      localStorage.removeItem('labelx_profile_id')
+      window.location.href = '/profile'
+    }
     throw new Error(err.detail || `Server error: ${response.status}`)
   }
 
