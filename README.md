@@ -2,7 +2,7 @@
 
 > **Paste or photograph food ingredients → Get a personalized AI safety report in seconds.**
 
-LabelX is a full-stack web application that uses a **multi-agent LangGraph workflow** powered by **Gemini 2.0 Flash** to analyze food ingredients and generate personalized safety reports based on your health profile.
+LabelX is a full-stack web application that uses a **multi-agent LangGraph workflow** powered by **Gemini 3.1 Flash-Lite** to analyze food ingredients and generate personalized safety reports based on your health profile.
 
 ---
 
@@ -29,10 +29,10 @@ React Frontend (Vercel)
 FastAPI Backend (Render)
      ↓
 LangGraph Workflow
-├── Supervisor Agent   — routing hub
-├── Research Agent     — Qdrant (FastEmbed) → Tavily fallback
-├── Analysis Agent     — Gemini 2.0 Flash report generation
-└── Critic Agent       — 4-gate validation, 3 retries max
+├── Supervisor Agent   — routing hub + relevance gate
+├── Research Agent     — Qdrant (FastEmbed) → Tavily fallback (parallelized)
+├── Analysis Agent     — Gemini 3.1 Flash-Lite report generation (medium thinking)
+└── Critic Agent       — 6-gate validation (low thinking), 3 retries max
      ↓
 Qdrant Cloud          — 70+ food additive embeddings
 Redis Cloud           — profile & history storage
@@ -103,7 +103,8 @@ npm run dev
 ## 🤖 Agent Design
 
 ### Supervisor Agent
-Routes between agents based on state flags in `AnalysisState`. Acts as the workflow hub — all agents return to it after completing.
+Routes between agents based on state flags in `AnalysisState`. Acts as the workflow hub — all agents return to it after completing. 
+**Relevance Gate**: Runs an initial LLM check to ensure the input actually describes food ingredients. If it detects a non-food item (e.g. shampoo), it immediately terminates the workflow with a clear error message.
 
 ### Research Agent
 1. Embeds ingredient name with **FastEmbed** (`BAAI/bge-small-en-v1.5`)
@@ -112,12 +113,12 @@ Routes between agents based on state flags in `AnalysisState`. Acts as the workf
 4. Passes raw Tavily results to **Gemini** for structured parsing
 
 ### Analysis Agent
-- Calls **Gemini 2.0 Flash** with full research data + user profile
+- Calls **Gemini 3.1 Flash-Lite** (using "medium" thinking level instructions) with full research data + user profile
 - **Beginner mode**: Plain language, no jargon
 - **Expert mode**: E-numbers, biochemical effects, regulatory classifications
 - **Condition-specific**: Diabetes → hidden sugars, Hypertension → sodium sources, Celiac → gluten, PKU → aspartame
 
-### Critic Agent — 4 Validation Gates
+### Critic Agent — 6 Validation Gates
 
 | Gate | Check |
 |---|---|
@@ -125,6 +126,8 @@ Routes between agents based on state flags in `AnalysisState`. Acts as the workf
 | Allergen Check | All user allergens are flagged in the report |
 | Score Consistency | 3+ harmful ingredients → score must be < 40 |
 | Personalization | User health conditions mentioned in report |
+| Relevance | Confirms the report is evaluating a food product |
+| Clarity | Report is free of unexplained scientific jargon for beginners |
 
 On failure → clears report → sends feedback to Analysis Agent → retry (max 3).
 After 3 failures → returns best-effort report with disclaimer.
@@ -179,6 +182,10 @@ LabelX/
 │       ├── ocr_service.py       # Tesseract OCR
 │       ├── gemini_service.py    # LLM helpers
 │       └── seed_qdrant.py       # Database seeder (run once)
+│   └── scripts/
+│       ├── test_simple_workflow.py   # Test valid ingredient list
+│       ├── test_relevance_gate.py    # Test rejection of non-food items
+│       └── test_complete_workflow.py # Test full workflow with retry simulation
 └── frontend/
     └── src/
         ├── pages/

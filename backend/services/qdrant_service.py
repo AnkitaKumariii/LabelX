@@ -75,8 +75,69 @@ def embed_text(text: str) -> List[float]:
     embeddings = list(model.embed([text]))
     return embeddings[0].tolist()
 
+def embed_texts(texts: List[str]) -> List[List[float]]:
+    if not texts:
+        return []
+    model = get_embed_model()
+    embeddings = list(model.embed(texts))
+    return [e.tolist() for e in embeddings]
+
 
 # ── Search ─────────────────────────────────────────────────────────────────────
+
+async def search_ingredients_batch(ingredient_names: List[str]) -> List[Optional[Dict[str, Any]]]:
+    """
+    Search Qdrant for the best matching food additives in a single batch request.
+    Returns a list of dicts or None for each ingredient if confidence is below 0.
+    """
+    if not ingredient_names:
+        return []
+
+    try:
+        client = await get_qdrant()
+        query_vectors = embed_texts([name.lower() for name in ingredient_names])
+        
+        from qdrant_client.models import SearchRequest
+        
+        requests = [
+            SearchRequest(
+                vector=vector,
+                limit=1,
+                score_threshold=0.0
+            ) for vector in query_vectors
+        ]
+        
+        batch_results = await client.search_batch(
+            collection_name=COLLECTION_NAME,
+            requests=requests
+        )
+        
+        parsed_results = []
+        for i, results in enumerate(batch_results):
+            if not results:
+                parsed_results.append(None)
+                continue
+                
+            best = results[0]
+            confidence = float(best.score)
+            payload = best.payload or {}
+            
+            parsed_results.append({
+                "name": payload.get("name", ingredient_names[i]),
+                "aliases": payload.get("aliases", []),
+                "safety_rating": payload.get("safety_rating", "unknown"),
+                "health_impact": payload.get("health_impact", "No data."),
+                "conditions_affected": payload.get("conditions_affected", []),
+                "banned_in": payload.get("banned_in", []),
+                "daily_limit_mg": payload.get("daily_limit_mg"),
+                "source": "qdrant",
+                "confidence": confidence,
+            })
+            
+        return parsed_results
+    except Exception as e:
+        logger.error(f"Qdrant batch search error: {e}")
+        return [None] * len(ingredient_names)
 
 async def search_ingredient(ingredient_name: str) -> Optional[Dict[str, Any]]:
     """

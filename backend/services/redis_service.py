@@ -111,6 +111,20 @@ async def get_history(profile_id: str, limit: int = 20) -> List[Dict[str, Any]]:
     return [json.loads(item) for item in raw_list]
 
 
+# ── Tavily Cache helpers ───────────────────────────────────────────────────────
+
+async def get_tavily_cache(ingredient: str) -> Optional[Dict[str, Any]]:
+    r = await get_redis()
+    raw = await r.get(f"tavily:{ingredient.lower()}")
+    if raw:
+        return json.loads(raw)
+    return None
+
+async def set_tavily_cache(ingredient: str, data: Dict[str, Any]) -> None:
+    r = await get_redis()
+    await r.set(f"tavily:{ingredient.lower()}", json.dumps(data), ex=60 * 60 * 24)  # 24 hours
+
+
 # ── Health check ──────────────────────────────────────────────────────────────
 
 async def ping_redis() -> bool:

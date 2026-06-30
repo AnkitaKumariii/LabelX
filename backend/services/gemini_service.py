@@ -155,6 +155,7 @@ async def generate_analysis_report(
     condition_guidance = "\n".join(condition_notes) if condition_notes else "No special conditions."
 
     prompt = f"""You are an expert food safety analyst providing a personalized report.
+THINKING LEVEL: MEDIUM. Reason carefully to adapt to the user's specific health profile.
 
 USER PROFILE:
 - Health Conditions: {conditions_str}
@@ -215,3 +216,98 @@ Respond with ONLY the JSON object, no markdown."""
     raw = raw.strip()
     report = json.loads(raw)
     return report
+
+
+async def check_relevance(text: str) -> tuple[bool, str]:
+    """
+    Relevance Gate: Ensure the input is actually a food product ingredient list.
+    """
+    model = get_model()
+    prompt = f"""You are a relevance filter for a food label analyzer.
+Determine if the following text represents a valid list of food ingredients (or a single food ingredient).
+If it is clearly NOT food (e.g., shampoo ingredients, random code, a poem, toxic chemicals not used in food), reject it.
+
+Text:
+{text}
+
+Respond with ONLY a JSON object:
+{{
+  "is_food": true/false,
+  "reason": "Brief explanation if false, otherwise empty string"
+}}"""
+    response = model.generate_content(prompt)
+    raw = response.text.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    try:
+        data = json.loads(raw.strip())
+        return data.get("is_food", True), data.get("reason", "")
+    except Exception as e:
+        logger.error(f"Relevance check failed: {e}")
+        return True, ""
+
+
+async def validate_report_with_critic(
+    ingredients: List[str],
+    report: Dict[str, Any],
+    user_profile: Dict[str, Any]
+) -> tuple[bool, Dict[str, bool], List[str]]:
+    """
+    Use Gemini 3.1 Flash-Lite (low thinking) to validate 6 Critic gates.
+    """
+    model = get_model()
+    
+    ingredients_str = ", ".join(ingredients)
+    allergies_str = ", ".join(user_profile.get("allergies", []))
+    conditions_str = ", ".join(user_profile.get("health_conditions", []))
+    report_json = json.dumps(report, indent=2)
+    
+    prompt = f"""You are the Critic Agent. Your job is to strictly validate a food safety report.
+THINKING LEVEL: LOW. Perform these 6 simple validation checks quickly and strictly.
+
+INPUTS:
+Ingredients: {ingredients_str}
+User Allergies: {allergies_str}
+User Conditions: {conditions_str}
+
+REPORT TO VALIDATE:
+{report_json}
+
+Validate the following 6 gates (yes/no):
+1. Completeness: Does the report address every single ingredient in the input list?
+2. Allergen Check: Are all user allergies clearly flagged if they match any ingredient?
+3. Score Consistency: If there are 3+ harmful ingredients, is the health_score < 40?
+4. Personalization: Does the summary or personalized_note explicitly mention/address the user's health conditions?
+5. Relevance: Is this report actually evaluating food? (Confirm it's not analyzing shampoo, etc.)
+6. Clarity: Is the report free of overly complex, unexplained scientific jargon (suitable for beginner)?
+
+Respond with ONLY a JSON object exactly like this:
+{{
+  "gates": {{
+    "completeness": true/false,
+    "allergen_check": true/false,
+    "score_consistency": true/false,
+    "personalization": true/false,
+    "relevance": true/false,
+    "clarity": true/false
+  }},
+  "failures": ["If any gate is false, list the specific reason why it failed here"]
+}}"""
+
+    response = model.generate_content(prompt)
+    raw = response.text.strip()
+    if raw.startswith("```"):
+        raw = raw.split("```")[1]
+        if raw.startswith("json"):
+            raw = raw[4:]
+    try:
+        data = json.loads(raw.strip())
+        gates = data.get("gates", {})
+        failures = data.get("failures", [])
+        passed = all(gates.values())
+        return passed, gates, failures
+    except Exception as e:
+        logger.error(f"Critic validation failed: {e}")
+        return False, {}, ["Failed to parse Critic response."]

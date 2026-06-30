@@ -16,11 +16,15 @@ async def _emit(queue, event: dict) -> None:
 
 
 async def analysis_node(state: AnalysisState) -> AnalysisState:
+    import time
     from services.gemini_service import generate_analysis_report
 
+    start_time = time.time()
     queue = state.get("event_queue")
     retry_count = state.get("retry_count", 0)
     feedback = state.get("feedback")
+
+    await _emit(queue, {"stage": "analysis", "status": "running"})
 
     msg = (
         f"Generating report (retry #{retry_count})…"
@@ -55,6 +59,7 @@ async def analysis_node(state: AnalysisState) -> AnalysisState:
         updates = list(state.get("status_updates", []))
         updates.append({"type": "analysis_done", "score": score})
 
+        await _emit(queue, {"stage": "analysis", "status": "done", "duration_sec": time.time() - start_time})
         return {
             **state,
             "report": report,
@@ -71,4 +76,5 @@ async def analysis_node(state: AnalysisState) -> AnalysisState:
             "agent": "Analysis Agent",
             "message": str(e),
         })
+        await _emit(queue, {"stage": "analysis", "status": "done", "duration_sec": time.time() - start_time})
         return {**state, "error": str(e)}

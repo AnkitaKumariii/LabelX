@@ -51,13 +51,15 @@ class AnalysisReport(TypedDict, total=False):
 
 
 class AnalysisState(TypedDict, total=False):
-    # Input
+    # Inputs
     ingredients: List[str]
-    user_profile: UserProfile
-
-    # Agent results
+    user_profile: Dict[str, Any]
+    
+    # Internal State
+    invalid_product: bool
+    invalid_reason: str
     research_results: List[IngredientResearch]
-    report: Optional[AnalysisReport]
+    report: Optional[Dict[str, Any]]
     score: Optional[int]
 
     # Critic loop

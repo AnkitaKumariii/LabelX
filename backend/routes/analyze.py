@@ -94,27 +94,35 @@ def _stream_analysis(ingredients: List[str], profile: dict, profile_id: str) -> 
         }
         try:
             final_state = await graph.ainvoke(initial_state)
-            report = final_state.get("report") or {}
-            score = final_state.get("score") or report.get("summary", {}).get("health_score", 0)
+            
+            if final_state.get("invalid_product"):
+                await queue.put({
+                    "type": "error",
+                    "message": f"Invalid product detected: {final_state.get('invalid_reason')}",
+                    "progress": 100,
+                })
+            else:
+                report = final_state.get("report") or {}
+                score = final_state.get("score") or report.get("summary", {}).get("health_score", 0)
 
-            # Save to history
-            history_entry = {
-                "analysis_id": analysis_id,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "health_score": score,
-                "ingredient_count": len(ingredients),
-                "summary_snippet": report.get("summary", {}).get("personalized_summary", "")[:200],
-                "report": report,
-            }
-            await redis_service.save_analysis(profile_id, history_entry)
+                # Save to history
+                history_entry = {
+                    "analysis_id": analysis_id,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                    "health_score": score,
+                    "ingredient_count": len(ingredients),
+                    "summary_snippet": report.get("summary", {}).get("personalized_summary", "")[:200],
+                    "report": report,
+                }
+                await redis_service.save_analysis(profile_id, history_entry)
 
-            await queue.put({
-                "type": "complete",
-                "analysis_id": analysis_id,
-                "report": report,
-                "score": score,
-                "progress": 100,
-            })
+                await queue.put({
+                    "type": "complete",
+                    "analysis_id": analysis_id,
+                    "report": report,
+                    "score": score,
+                    "progress": 100,
+                })
         except Exception as e:
             logger.error(f"Workflow error: {e}", exc_info=True)
             await queue.put({"type": "error", "message": str(e)})
