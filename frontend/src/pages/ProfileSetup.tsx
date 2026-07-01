@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { createProfile, updateProfile, getProfile } from '../services/api'
 
 const HEALTH_CONDITIONS = [
-  { id: 'diabetes',       label: 'Diabetes',           emoji: '🩸', desc: 'Flags hidden sugars & high GI ingredients' },
-  { id: 'hypertension',   label: 'Hypertension / BP',  emoji: '❤️', desc: 'Flags sodium sources & BP-raising additives' },
-  { id: 'celiac',         label: 'Celiac Disease',      emoji: '🌾', desc: 'Flags all gluten-containing ingredients' },
-  { id: 'pku',            label: 'PKU',                 emoji: '⚗️',  desc: 'Strictly flags aspartame & phenylalanine' },
-  { id: 'ibs',            label: 'IBS',                 emoji: '🫁', desc: 'Flags gut irritants & fermentable additives' },
-  { id: 'gout',           label: 'Gout',                emoji: '🦵', desc: 'Flags purines and uric acid triggers' },
-  { id: 'heart disease',  label: 'Heart Disease',       emoji: '💙', desc: 'Flags trans fats & cardiovascular risks' },
-  { id: 'kidney disease', label: 'Kidney Disease',      emoji: '🫘', desc: 'Flags phosphorus, potassium, sodium excess' },
+  { id: 'diabetes',       label: 'Diabetes',           emoji: '', desc: 'Flags hidden sugars & high GI ingredients' },
+  { id: 'hypertension',   label: 'Hypertension / BP',  emoji: '', desc: 'Flags sodium sources & BP-raising additives' },
+  { id: 'celiac',         label: 'Celiac Disease',      emoji: '', desc: 'Flags all gluten-containing ingredients' },
+  { id: 'pku',            label: 'PKU',                 emoji: '',  desc: 'Strictly flags aspartame & phenylalanine' },
+  { id: 'ibs',            label: 'IBS',                 emoji: '', desc: 'Flags gut irritants & fermentable additives' },
+  { id: 'gout',           label: 'Gout',                emoji: '', desc: 'Flags purines and uric acid triggers' },
+  { id: 'heart disease',  label: 'Heart Disease',       emoji: '', desc: 'Flags trans fats & cardiovascular risks' },
+  { id: 'kidney disease', label: 'Kidney Disease',      emoji: '', desc: 'Flags phosphorus, potassium, sodium excess' },
 ]
 
 const ALLERGEN_PRESETS = ['Gluten', 'Dairy', 'Soy', 'Tree Nuts', 'Peanuts', 'Eggs', 'Fish', 'Shellfish', 'Sesame']
@@ -95,7 +95,7 @@ export default function ProfileSetup() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm text-brand-blue mb-6 border border-brand-blue/20">
-            <span>✨</span> Set up your health profile
+            <span></span> Set up your health profile
           </div>
           <h1 className="font-display font-bold text-4xl sm:text-5xl mb-4">
             Personalize Your <span className="gradient-text">Analysis</span>
@@ -116,7 +116,7 @@ export default function ProfileSetup() {
                     step > s ? 'bg-brand-green/30 text-brand-green border border-brand-green/40' :
                     'bg-slate-100 text-slate-400'}`}
               >
-                {step > s ? '✓' : s}
+                {step > s ? '' : s}
               </button>
               {s < 3 && <div className={`w-12 h-0.5 rounded ${step > s ? 'bg-brand-blue/50' : 'bg-slate-100'}`} />}
             </div>
@@ -156,7 +156,7 @@ export default function ProfileSetup() {
                         ? 'border-brand-blue/60 bg-brand-blue/10 ring-1 ring-brand-blue/30'
                         : 'border-slate-200 glass hover:border-slate-300'}`}
                   >
-                    <div className="text-2xl mb-2">{level === 'beginner' ? '🌱' : '🔬'}</div>
+                    <div className="text-2xl mb-2">{level === 'beginner' ? '' : ''}</div>
                     <div className="font-semibold capitalize">{level}</div>
                     <div className="text-xs text-slate-500 mt-1">
                       {level === 'beginner'
@@ -208,7 +208,7 @@ export default function ProfileSetup() {
                       ${form.health_conditions.includes(cond.id)
                         ? 'bg-brand-brown border-brand-brown text-slate-900 text-xs'
                         : 'border-slate-300'}`}>
-                      {form.health_conditions.includes(cond.id) && '✓'}
+                      {form.health_conditions.includes(cond.id) && ''}
                     </div>
                   </div>
                 </button>
@@ -216,7 +216,7 @@ export default function ProfileSetup() {
             </div>
 
             <div className="flex gap-4">
-              <button id="btn-back-step2" onClick={() => setStep(1)} className="btn-secondary flex-1">← Back</button>
+              <button id="btn-back-step2" onClick={() => setStep(1)} className="btn-secondary flex-1">Back</button>
               <button id="btn-next-step2" onClick={() => setStep(3)} className="btn-primary flex-1">Continue →</button>
             </div>
           </div>
@@ -245,7 +245,7 @@ export default function ProfileSetup() {
                         ? 'border-brand-red/40 bg-brand-red/10 text-brand-red cursor-default'
                         : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-900'}`}
                   >
-                    {a} {form.allergies.includes(a.toLowerCase()) && '✓'}
+                    {a} {form.allergies.includes(a.toLowerCase()) && ''}
                   </button>
                 ))}
               </div>
@@ -281,7 +281,7 @@ export default function ProfileSetup() {
                 <div className="flex flex-wrap gap-2">
                   {form.allergies.map(a => (
                     <span key={a} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg badge-harmful text-sm font-medium border">
-                      ⚠️ {a}
+                      {a}
                       <button onClick={() => removeAllergen(a)} className="hover:text-slate-600 ml-1 text-xs">×</button>
                     </span>
                   ))}
@@ -296,7 +296,7 @@ export default function ProfileSetup() {
             )}
 
             <div className="flex gap-4">
-              <button id="btn-back-step3" onClick={() => setStep(2)} className="btn-secondary flex-1">← Back</button>
+              <button id="btn-back-step3" onClick={() => setStep(2)} className="btn-secondary flex-1">Back</button>
               <button
                 id="btn-save-profile"
                 onClick={handleSubmit}

@@ -1,8 +1,8 @@
 const RATING_CONFIG = {
-  safe:    { label: 'Safe',    emoji: '🟢', cls: 'badge-safe',    dot: 'bg-brand-green' },
-  caution: { label: 'Caution', emoji: '🟡', cls: 'badge-caution', dot: 'bg-brand-yellow' },
-  harmful: { label: 'Harmful', emoji: '🔴', cls: 'badge-harmful', dot: 'bg-brand-red' },
-  other: { label: 'Other', emoji: '⚪', cls: 'badge-other', dot: 'bg-slate-300' },
+  safe:    { label: 'Safe',    emoji: '', cls: 'badge-safe',    dot: 'bg-brand-green' },
+  caution: { label: 'Caution', emoji: '', cls: 'badge-caution', dot: 'bg-brand-yellow' },
+  harmful: { label: 'Harmful', emoji: '', cls: 'badge-harmful', dot: 'bg-brand-red' },
+  other: { label: 'Other', emoji: '', cls: 'badge-other', dot: 'bg-slate-300' },
 }
 
 export default function IngredientBadge({ ingredient, expanded = false, onClick }) {
@@ -25,7 +25,7 @@ export default function IngredientBadge({ ingredient, expanded = false, onClick 
           <span className="font-semibold text-sm truncate">{ingredient.name}</span>
           {ingredient.banned_in?.length > 0 && (
             <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
-              🚫 {ingredient.banned_in.length} countries
+               {ingredient.banned_in.length} countries
             </span>
           )}
         </div>
@@ -47,7 +47,7 @@ export default function IngredientBadge({ ingredient, expanded = false, onClick 
 
           {ingredient.personalized_note && (
             <div className="flex items-start gap-2 p-2.5 rounded-lg bg-brand-blue/8 border border-brand-blue/20">
-              <span className="text-brand-blue text-sm mt-0.5">⚡</span>
+              <span className="text-brand-blue text-sm mt-0.5"></span>
               <p className="text-sm text-brand-blue/90 leading-relaxed">{ingredient.personalized_note}</p>
             </div>
           )}

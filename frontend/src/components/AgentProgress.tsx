@@ -1,8 +1,8 @@
 const AGENTS = [
-  { key: 'supervisor', label: 'Supervisor',     icon: '🧠', desc: 'Orchestrating workflow' },
-  { key: 'research',   label: 'Research Agent', icon: '🔬', desc: 'Searching ingredient database' },
-  { key: 'analysis',   label: 'Analysis Agent', icon: '📊', desc: 'Generating personalized report' },
-  { key: 'critic',     label: 'Critic Agent',   icon: '✅', desc: 'Validating report quality' },
+  { key: 'supervisor', label: 'Supervisor',     icon: '', desc: 'Orchestrating workflow' },
+  { key: 'research',   label: 'Research Agent', icon: '', desc: 'Searching ingredient database' },
+  { key: 'analysis',   label: 'Analysis Agent', icon: '', desc: 'Generating personalized report' },
+  { key: 'critic',     label: 'Critic Agent',   icon: '', desc: 'Validating report quality' },
 ]
 
 export default function AgentProgress({ events = [], currentAgent = null, progress = 0 }) {
@@ -75,10 +75,10 @@ export default function AgentProgress({ events = [], currentAgent = null, progre
           [...events].reverse().slice(0, 20).map((event, i) => (
             <div key={i} className={`flex items-start gap-2 ${i === 0 ? 'text-slate-800' : 'text-slate-500'}`}>
               <span className="shrink-0 mt-px">
-                {event.type === 'error' ? '❌' :
-                 event.type === 'complete' ? '🎉' :
-                 event.type === 'critic_result' ? (event.passed ? '✅' : '⚠️') :
-                 event.type === 'research_fallback' ? '🌐' : '›'}
+                {event.type === 'error' ? '' :
+                 event.type === 'complete' ? '' :
+                 event.type === 'critic_result' ? (event.passed ? '' : '') :
+                 event.type === 'research_fallback' ? '' : '›'}
               </span>
               <span className="leading-relaxed break-all">
                 {event.message || event.type}

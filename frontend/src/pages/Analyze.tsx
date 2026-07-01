@@ -98,7 +98,7 @@ export default function Analyze() {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="glass rounded-2xl p-10 text-center max-w-md">
-          <div className="text-5xl mb-4">👤</div>
+          <div className="text-5xl mb-4"></div>
           <h2 className="font-display font-bold text-2xl mb-3">Profile Required</h2>
           <p className="text-slate-500 mb-6">Set up your health profile first to get personalized analysis.</p>
           <button onClick={() => navigate('/profile')} className="btn-primary w-full">
@@ -115,7 +115,7 @@ export default function Analyze() {
         {/* Header */}
         <div className="text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm text-brand-brown/80 mb-6 border border-brand-brown/20">
-            <span>🔬</span> Multi-agent AI analysis
+            <span></span> Multi-agent AI analysis
           </div>
           <h1 className="font-display font-bold text-4xl sm:text-5xl mb-4">
             Analyze <span className="gradient-text">Ingredients</span>
@@ -127,7 +127,7 @@ export default function Analyze() {
           {/* Text Input Panel */}
           <div className="glass rounded-2xl p-6 space-y-4">
             <h2 className="font-display font-semibold text-lg">
-              📋 Paste Ingredient List
+              Paste Ingredient List
             </h2>
             <div className="space-y-3">
               <textarea
@@ -154,7 +154,7 @@ e.g. Water, Sugar, High Fructose Corn Syrup, Citric Acid, Natural Flavors, Sodiu
           {/* Image Upload Panel */}
           <div className="glass rounded-2xl p-6 space-y-4">
             <h2 className="font-display font-semibold text-lg">
-              🖼️ Upload Product Photo
+              Upload Product Photo
             </h2>
             <div
               id="upload-zone"
@@ -190,7 +190,7 @@ e.g. Water, Sugar, High Fructose Corn Syrup, Citric Acid, Natural Flavors, Sodiu
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="text-5xl animate-float">📸</div>
+                  <div className="text-5xl animate-float"></div>
                   <p className="text-slate-500 text-sm">Drag & drop or click to upload</p>
                   <p className="text-slate-400 text-xs">PNG, JPG, WEBP — max 10MB</p>
                   <p className="text-brand-blue/60 text-xs">OCR will extract ingredient text automatically</p>
@@ -217,7 +217,7 @@ e.g. Water, Sugar, High Fructose Corn Syrup, Citric Acid, Natural Flavors, Sodiu
                 Analyzing…
               </span>
             ) : (
-              '🔍 Analyze Ingredients'
+              'Analyze Ingredients'
             )}
           </button>
         </div>
@@ -225,7 +225,7 @@ e.g. Water, Sugar, High Fructose Corn Syrup, Citric Acid, Natural Flavors, Sodiu
         {/* Error */}
         {error && (
           <div className="glass rounded-xl p-4 border border-brand-red/30 bg-brand-red/5 text-brand-red text-sm text-center">
-            ❌ {error}
+            {error}
           </div>
         )}
 

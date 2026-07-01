@@ -89,10 +89,10 @@ export default function Results() {
           </div>
           <div className="flex gap-3 flex-wrap">
             <button id="btn-new-analysis" onClick={() => navigate('/analyze')} className="btn-secondary">
-              ← New Analysis
+              New Analysis
             </button>
             <button id="btn-download-report" onClick={handleDownload} className="btn-secondary">
-              ⬇️ Download JSON
+              Download JSON
             </button>
           </div>
         </div>
@@ -100,7 +100,7 @@ export default function Results() {
         {/* Disclaimer */}
         {report.disclaimer && (
           <div className="glass rounded-xl p-4 border border-brand-yellow/30 bg-brand-yellow/5 flex items-start gap-3">
-            <span className="text-xl shrink-0">⚠️</span>
+            <span className="text-xl shrink-0"></span>
             <p className="text-sm text-brand-yellow/80 leading-relaxed">{report.disclaimer}</p>
           </div>
         )}
@@ -120,22 +120,22 @@ export default function Results() {
           {/* Stats grid */}
           <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-2 gap-4">
             <SummaryCard
-              icon="🟢" title="Safe Ingredients"
+              icon="" title="Safe Ingredients"
               value={summary.safe_count ?? 0}
               color="green"
             />
             <SummaryCard
-              icon="🟡" title="Caution Items"
+              icon="" title="Caution Items"
               value={summary.caution_count ?? 0}
               color="yellow"
             />
             <SummaryCard
-              icon="🔴" title="Harmful Items"
+              icon="" title="Harmful Items"
               value={summary.harmful_count ?? 0}
               color="red"
             />
             <SummaryCard
-              icon="⚪" title="Other Items"
+              icon="" title="Other Items"
               value={summary.other_count ?? 0}
               color="white"
             />
@@ -145,7 +145,7 @@ export default function Results() {
         {/* Personalized Summary */}
         <div className="glass rounded-2xl p-6 space-y-4">
           <h2 className="font-display font-semibold text-lg flex items-center gap-2">
-            <span>💡</span> Personalized Summary
+            <span></span> Personalized Summary
           </h2>
           <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
             {summary.personalized_summary || 'No summary available.'}
@@ -158,7 +158,7 @@ export default function Results() {
               <div className="flex flex-wrap gap-2">
                 {summary.top_warnings.map((w, i) => (
                   <span key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg badge-caution text-xs border">
-                    ⚠️ {w}
+                    {w}
                   </span>
                 ))}
               </div>
@@ -172,7 +172,7 @@ export default function Results() {
               <div className="flex flex-wrap gap-2">
                 {summary.allergen_alerts.map((a, i) => (
                   <span key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg badge-harmful text-xs border font-semibold">
-                    🚨 {a}
+                    {a}
                   </span>
                 ))}
               </div>
@@ -200,7 +200,7 @@ export default function Results() {
                     className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all
                       ${sortBy === s ? 'bg-slate-100 text-slate-900' : 'text-slate-500 hover:text-slate-600'}`}
                   >
-                    {s === 'severity' ? '🚦 Severity' : '🔤 Name'}
+                    {s === 'severity' ? 'Severity' : 'Name'}
                   </button>
                 ))}
               </div>
