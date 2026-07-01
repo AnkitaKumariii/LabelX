@@ -12,6 +12,9 @@ const api = axios.create({
 export const createProfile = (data) =>
   api.post('/api/profile', data).then((r) => r.data)
 
+export const verifyGoogleToken = (token: string) =>
+  api.post('/api/auth/google', { token }).then((r) => r.data)
+
 export const updateProfile = (profileId, data) =>
   api.put(`/api/profile/${profileId}`, data).then((r) => r.data)
 
@@ -21,7 +24,7 @@ export const getProfile = async (profileId) => {
     return r.data
   } catch (error) {
     if (error.response?.status === 404) {
-      localStorage.removeItem('labelx_profile_id')
+      localStorage.removeItem('labelx_google_id')
       window.location.href = '/profile'
     }
     throw error
@@ -52,7 +55,7 @@ export async function* streamAnalysis(profileId, ingredients, rawText = null) {
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
     if (response.status === 404 && err.detail?.includes('Profile not found')) {
-      localStorage.removeItem('labelx_profile_id')
+      localStorage.removeItem('labelx_google_id')
       window.location.href = '/profile'
     }
     throw new Error(err.detail || `Server error: ${response.status}`)
@@ -101,7 +104,7 @@ export async function* streamImageAnalysis(profileId, imageFile) {
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
     if (response.status === 404 && err.detail?.includes('Profile not found')) {
-      localStorage.removeItem('labelx_profile_id')
+      localStorage.removeItem('labelx_google_id')
       window.location.href = '/profile'
     }
     throw new Error(err.detail || `Server error: ${response.status}`)

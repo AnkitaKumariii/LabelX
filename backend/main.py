@@ -71,10 +71,12 @@ app.add_middleware(
 from routes.analyze import router as analyze_router
 from routes.profile import router as profile_router
 from routes.history import router as history_router
+from routes.auth import router as auth_router
 
 app.include_router(analyze_router, prefix="/api", tags=["Analysis"])
 app.include_router(profile_router, prefix="/api", tags=["Profile"])
 app.include_router(history_router, prefix="/api", tags=["History"])
+app.include_router(auth_router, prefix="/api", tags=["Auth"])
 
 
 @app.get("/health", tags=["Health"])

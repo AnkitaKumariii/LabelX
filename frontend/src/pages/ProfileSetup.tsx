@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createProfile, updateProfile, getProfile } from '../services/api'
+import { createProfile, updateProfile, getProfile, verifyGoogleToken } from '../services/api'
+import { GoogleLogin } from '@react-oauth/google'
 
 const HEALTH_CONDITIONS = [
   { id: 'diabetes',       label: 'Diabetes',           emoji: '', desc: 'Flags hidden sugars & high GI ingredients' },
@@ -17,6 +18,7 @@ const ALLERGEN_PRESETS = ['Gluten', 'Dairy', 'Soy', 'Tree Nuts', 'Peanuts', 'Egg
 
 export default function ProfileSetup() {
   const navigate = useNavigate()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -31,7 +33,7 @@ export default function ProfileSetup() {
 
   // Load existing profile
   useEffect(() => {
-    const savedId = localStorage.getItem('labelx_profile_id')
+    const savedId = localStorage.getItem('labelx_google_id')
     if (savedId) {
       getProfile(savedId)
         .then(p => {
@@ -41,10 +43,34 @@ export default function ProfileSetup() {
             health_conditions: p.health_conditions || [],
             allergies: p.allergies || [],
           })
+          setIsAuthenticated(true)
         })
-        .catch(() => {})
+        .catch(() => {
+          localStorage.removeItem('labelx_google_id')
+        })
     }
   }, [])
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const profile = await verifyGoogleToken(credentialResponse.credential)
+      localStorage.setItem('labelx_google_id', profile.profile_id)
+      setForm({
+        name: profile.name || '',
+        expertise_level: profile.expertise_level || 'beginner',
+        health_conditions: profile.health_conditions || [],
+        allergies: profile.allergies || [],
+      })
+      setIsAuthenticated(true)
+      
+      // If they already have a customized profile, take them straight to analyze
+      if (profile.health_conditions.length > 0 || profile.allergies.length > 0) {
+        navigate('/analyze')
+      }
+    } catch (err) {
+      setError('Google Login failed.')
+    }
+  }
 
   const toggleCondition = (id) => {
     setForm(f => ({
@@ -73,20 +99,47 @@ export default function ProfileSetup() {
     setLoading(true)
     setError(null)
     try {
-      const savedId = localStorage.getItem('labelx_profile_id')
+      const savedId = localStorage.getItem('labelx_google_id')
       let profile
       if (savedId) {
         profile = await updateProfile(savedId, form)
       } else {
         profile = await createProfile(form)
       }
-      localStorage.setItem('labelx_profile_id', profile.profile_id)
+      localStorage.setItem('labelx_google_id', profile.profile_id)
       navigate('/analyze')
     } catch (err) {
       setError(err.response?.data?.detail || err.message || 'Failed to save profile')
     } finally {
       setLoading(false)
     }
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen py-12 px-4 flex flex-col items-center justify-center page-enter">
+        <div className="max-w-md w-full glass rounded-3xl p-10 text-center shadow-xl border border-white/20">
+          <div className="w-20 h-20 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <svg className="w-10 h-10 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold font-display mb-3 text-slate-900">Welcome to LabelX</h1>
+          <p className="text-slate-500 mb-8">Sign in with Google to securely store your health profile and analysis history.</p>
+          
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Login Failed')}
+              useOneTap
+              theme="filled_blue"
+              shape="pill"
+            />
+          </div>
+          {error && <p className="text-brand-red mt-4 text-sm font-medium">{error}</p>}
+        </div>
+      </div>
+    )
   }
 
   return (

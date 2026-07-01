@@ -67,3 +67,6 @@ class HistoryItem(BaseModel):
     health_score: int
     ingredient_count: int
     summary_snippet: str
+
+class GoogleAuthRequest(BaseModel):
+    token: str

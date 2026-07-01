@@ -52,7 +52,7 @@ export default function Navbar() {
 
         {/* Profile indicator */}
         <div className="flex items-center gap-2">
-          {localStorage.getItem('labelx_profile_id') && (
+          {localStorage.getItem('labelx_google_id') && (
             <div className="flex items-center gap-2 px-3 py-1.5 glass rounded-full text-xs text-slate-500">
               <div className="w-2 h-2 rounded-full bg-brand-green animate-pulse-slow" />
               Profile Active

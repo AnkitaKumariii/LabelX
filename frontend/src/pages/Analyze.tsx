@@ -20,7 +20,7 @@ export default function Analyze() {
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState(null)
 
-  const profileId = localStorage.getItem('labelx_profile_id')
+  const profileId = localStorage.getItem('labelx_google_id')
 
   const addEvent = useCallback((event) => {
     setEvents(prev => [...prev.slice(-99), event])
