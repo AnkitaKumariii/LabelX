@@ -142,6 +142,7 @@ export default function Results() {
                   <tr className="bg-indigo-50/60 border-b border-slate-200">
                     <th className="py-4 px-6 font-semibold text-indigo-900 text-sm w-1/4">Ingredient</th>
                     <th className="py-4 px-6 font-semibold text-indigo-900 text-sm w-1/6">Safety Rating</th>
+                    <th className="py-4 px-6 font-semibold text-indigo-900 text-sm w-1/6">Classification</th>
                     <th className="py-4 px-6 font-semibold text-indigo-900 text-sm">Concerns / Notes</th>
                   </tr>
                 </thead>
@@ -154,7 +155,7 @@ export default function Results() {
                           <div className="text-xs text-slate-400 mt-1">{ing.aliases.join(', ')}</div>
                         )}
                       </td>
-                      <td className="py-4 px-6 align-top space-y-2">
+                      <td className="py-4 px-6 align-top">
                         <span className={`inline-flex px-0 py-1 rounded-md text-xs font-semibold uppercase tracking-wider
                           ${ing.safety_rating === 'safe' ? 'text-emerald-700' : 
                             ing.safety_rating === 'caution' ? 'text-amber-700' : 
@@ -165,7 +166,8 @@ export default function Results() {
                            ing.safety_rating === 'caution' ? 'CAUTION' : 
                            ing.safety_rating === 'harmful' ? 'HARMFUL' : ing.safety_rating}
                         </span>
-                        
+                      </td>
+                      <td className="py-4 px-6 align-top space-y-2">
                         {ing.processing_level && ing.processing_level !== 'unknown' && (
                            <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                              {ing.processing_level.replace('_', ' ')}
@@ -174,6 +176,11 @@ export default function Results() {
                         {ing.is_veg === false && (
                            <div className="text-[10px] uppercase font-bold text-rose-600 tracking-wider">
                              NON-VEG ({ing.ingredient_source})
+                           </div>
+                        )}
+                        {ing.is_veg !== false && (!ing.processing_level || ing.processing_level === 'unknown') && (
+                           <div className="text-[10px] uppercase text-slate-300">
+                             —
                            </div>
                         )}
                       </td>
