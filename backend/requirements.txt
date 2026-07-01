@@ -35,5 +35,4 @@ pydantic-settings==2.5.2
 
 # Utils
 numpy==1.26.4
-google-auth==2.35.0  
- 
+google-auth==2.35.0
