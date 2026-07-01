@@ -5,6 +5,7 @@ services:
     region: oregon
     plan: starter
     rootDir: backend
+    pythonVersion: "3.12"
     buildCommand: |
       pip install --upgrade pip
       pip install -r requirements.txt
@@ -25,4 +26,4 @@ services:
       - key: PYTHONUNBUFFERED
         value: "1"
       - key: PYTHON_VERSION
-        value: "3.11.9"
+        value: "3.12"
