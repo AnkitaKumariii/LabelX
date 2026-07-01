@@ -11,7 +11,9 @@ LabelX is a full-stack web application that uses a **multi-agent LangGraph workf
 | Feature | Details |
 |---|---|
 | **Multi-Agent AI** | Supervisor → Research → Analysis → Critic (LangGraph) |
+| **Google Authentication** | Secure One-Tap login with Google, saving all data securely |
 | **Personalized Reports** | Adapts to diabetes, hypertension, celiac, PKU, and more |
+| **Rule-based Classification** | Accurately flags Veg, Vegan, Non-Veg and Processing levels (Ultra-processed, Raw, etc.) |
 | **Live Streaming** | Server-Sent Events show real-time agent progress |
 | **Vector Search** | Qdrant + FastEmbed for 70+ ingredient embeddings |
 | **Web Fallback** | Tavily search for unknown ingredients |
@@ -25,17 +27,17 @@ LabelX is a full-stack web application that uses a **multi-agent LangGraph workf
 
 ```
 React Frontend (Vercel)
-     ↓ Axios / Fetch SSE
+     ↓ Axios / Fetch SSE (with Google ID Token)
 FastAPI Backend (Render)
      ↓
 LangGraph Workflow
 ├── Supervisor Agent   — routing hub + relevance gate
-├── Research Agent     — Qdrant (FastEmbed) → Tavily fallback (parallelized)
+├── Research Agent     — Qdrant (FastEmbed) → Tavily fallback (parallelized) + Veg/Processing Classifier
 ├── Analysis Agent     — Gemini 3.1 Flash-Lite report generation (medium thinking)
-└── Critic Agent       — 6-gate validation (low thinking), 3 retries max
+└── Critic Agent       — 7-gate validation (low thinking), 3 retries max
      ↓
 Qdrant Cloud          — 70+ food additive embeddings
-Redis Cloud           — profile & history storage
+Redis Cloud           — profile & history storage (Keyed by Google ID)
 ```
 
 ---
@@ -51,6 +53,7 @@ Redis Cloud           — profile & history storage
 - Redis Cloud account → [redis.com/try-free](https://redis.com/try-free)
 - Gemini API key → [aistudio.google.com](https://aistudio.google.com)
 - Tavily API key → [tavily.com](https://tavily.com)
+- Google OAuth Client ID → [console.cloud.google.com](https://console.cloud.google.com)
 
 ### Backend
 
@@ -72,6 +75,7 @@ uvicorn main:app --reload --port 8000
 
 ```bash
 cd frontend
+# Ensure frontend/.env contains your VITE_GOOGLE_CLIENT_ID
 npm install
 npm run dev
 # Opens at http://localhost:5173
@@ -92,11 +96,12 @@ npm run dev
 | `REDIS_URL` | Redis connection string |
 | `FRONTEND_URL` | Deployed Vercel URL (for CORS) |
 
-### Frontend (Vercel)
+### Frontend (`frontend/.env`)
 
 | Variable | Description |
 |---|---|
-| `VITE_API_URL` | Deployed backend URL (e.g. `https://labelx.onrender.com`) |
+| `VITE_API_URL` | Deployed backend URL (e.g. `http://localhost:8000`) |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth Client ID |
 
 ---
 
@@ -110,7 +115,8 @@ Routes between agents based on state flags in `AnalysisState`. Acts as the workf
 1. Embeds ingredient name with **FastEmbed** (`BAAI/bge-small-en-v1.5`)
 2. Searches **Qdrant Cloud** (cosine similarity, threshold: 0.7)
 3. Falls back to **Tavily** web search if confidence < 0.7
-4. Passes raw Tavily results to **Gemini** for structured parsing
+4. Evaluates against hardcoded lists to classify the ingredient's **Processing Level** (e.g., Ultra-Processed, Raw) and **Dietary Source** (Veg, Vegan, Non-Veg).
+5. Passes raw results + classification data to **Gemini** for structured parsing.
 
 ### Analysis Agent
 - Calls **Gemini 3.1 Flash-Lite** (using "medium" thinking level instructions) with full research data + user profile
@@ -118,7 +124,7 @@ Routes between agents based on state flags in `AnalysisState`. Acts as the workf
 - **Expert mode**: E-numbers, biochemical effects, regulatory classifications
 - **Condition-specific**: Diabetes → hidden sugars, Hypertension → sodium sources, Celiac → gluten, PKU → aspartame
 
-### Critic Agent — 6 Validation Gates
+### Critic Agent — 7 Validation Gates
 
 | Gate | Check |
 |---|---|
@@ -128,6 +134,7 @@ Routes between agents based on state flags in `AnalysisState`. Acts as the workf
 | Personalization | User health conditions mentioned in report |
 | Relevance | Confirms the report is evaluating a food product |
 | Clarity | Report is free of unexplained scientific jargon for beginners |
+| Dietary Compliance Check | Checks if Non-Veg ingredients are correctly highlighted as a CRITICAL WARNING for Vegetarian/Vegan users |
 
 On failure → clears report → sends feedback to Analysis Agent → retry (max 3).
 After 3 failures → returns best-effort report with disclaimer.
@@ -169,12 +176,13 @@ LabelX/
 │   ├── agents/
 │   │   ├── state.py             # AnalysisState TypedDict
 │   │   ├── supervisor.py        # Routing hub
-│   │   ├── research_agent.py    # Qdrant + Tavily
+│   │   ├── research_agent.py    # Qdrant + Tavily + Rule-based classifer
 │   │   ├── analysis_agent.py    # Gemini report writer
-│   │   └── critic_agent.py      # 4-gate validator
+│   │   └── critic_agent.py      # 7-gate validator
 │   ├── routes/
 │   │   ├── analyze.py           # POST /api/analyze (SSE)
 │   │   ├── profile.py           # POST/GET/PUT /api/profile
+│   │   ├── auth.py              # POST /api/auth/google
 │   │   └── history.py           # GET /api/history/{id}
 │   └── services/
 │       ├── redis_service.py     # Profile & history storage
@@ -185,11 +193,12 @@ LabelX/
 │   └── scripts/
 │       ├── test_simple_workflow.py   # Test valid ingredient list
 │       ├── test_relevance_gate.py    # Test rejection of non-food items
-│       └── test_complete_workflow.py # Test full workflow with retry simulation
+│       ├── test_complete_workflow.py # Test full workflow with retry simulation
+│       └── test_veg_classification.py# Test dietary/processing level checks
 └── frontend/
     └── src/
         ├── pages/
-        │   ├── ProfileSetup.tsx  # 3-step profile wizard
+        │   ├── ProfileSetup.tsx  # Google Login + profile wizard
         │   ├── Analyze.tsx       # Ingredient input + live SSE
         │   └── Results.tsx       # Report with gauge & badges
         └── components/
@@ -198,4 +207,3 @@ LabelX/
             ├── SummaryCard.tsx   # Stat cards
             └── AgentProgress.tsx # Live progress panel
 ```
-
