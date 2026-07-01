@@ -23,10 +23,19 @@ async def extract_text_from_image(image_bytes: bytes) -> str:
             image = image.convert("RGB")
 
         model = get_model()
-        prompt = "Extract all text from this image exactly as written. Output nothing else."
+        prompt = (
+            "Read the food label in this image and extract the list of ingredients. "
+            "Output only the ingredient names. Do not transcribe the entire label verbatim."
+        )
         
         response = model.generate_content([prompt, image])
-        text = response.text.strip()
+        
+        try:
+            text = response.text.strip()
+        except ValueError as e:
+            if response.candidates and getattr(response.candidates[0], 'finish_reason', None) == 4:
+                raise RuntimeError("The image text triggered copyright filters. Please type the ingredients manually.")
+            raise RuntimeError(f"Failed to read response: {e}")
 
         if not text:
             logger.warning("OCR returned empty text.")
@@ -35,6 +44,9 @@ async def extract_text_from_image(image_bytes: bytes) -> str:
         logger.info(f"OCR extracted {len(text)} characters.")
         return text
 
+    except RuntimeError as e:
+        logger.error(f"OCR failed: {e}")
+        raise e
     except Exception as e:
         logger.error(f"OCR failed: {e}")
         raise RuntimeError(f"Could not extract text from image: {e}")

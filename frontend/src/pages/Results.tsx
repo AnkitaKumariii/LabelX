@@ -4,7 +4,7 @@ import HealthGauge from '../components/HealthGauge'
 import IngredientBadge from '../components/IngredientBadge'
 import SummaryCard from '../components/SummaryCard'
 
-const FILTERS = ['all', 'harmful', 'caution', 'safe', 'unknown']
+const FILTERS = ['all', 'harmful', 'caution', 'safe', 'other']
 
 export default function Results() {
   const navigate = useNavigate()
@@ -16,7 +16,22 @@ export default function Results() {
   useEffect(() => {
     const raw = sessionStorage.getItem('labelx_last_report')
     if (raw) {
-      try { setReport(JSON.parse(raw)) }
+      try { 
+        const parsed = JSON.parse(raw)
+        
+        // Backward compatibility for old cached reports
+        if (parsed.summary && parsed.summary.unknown_count !== undefined) {
+            parsed.summary.other_count = parsed.summary.unknown_count
+        }
+        if (parsed.ingredients) {
+            parsed.ingredients = parsed.ingredients.map(i => ({
+                ...i,
+                safety_rating: i.safety_rating === 'unknown' ? 'other' : i.safety_rating
+            }))
+        }
+        
+        setReport(parsed) 
+      }
       catch { navigate('/analyze') }
     } else {
       navigate('/analyze')
@@ -33,7 +48,7 @@ export default function Results() {
   const ingredients = report.ingredients || []
   const score = summary.health_score ?? 0
 
-  const SEVERITY_ORDER = { harmful: 0, caution: 1, unknown: 2, safe: 3 }
+  const SEVERITY_ORDER = { harmful: 0, caution: 1, other: 2, safe: 3 }
   const sorted = [...ingredients].sort((a, b) =>
     sortBy === 'severity'
       ? (SEVERITY_ORDER[a.safety_rating] ?? 4) - (SEVERITY_ORDER[b.safety_rating] ?? 4)
@@ -120,8 +135,8 @@ export default function Results() {
               color="red"
             />
             <SummaryCard
-              icon="⚪" title="Unknown Items"
-              value={summary.unknown_count ?? 0}
+              icon="⚪" title="Other Items"
+              value={summary.other_count ?? 0}
               color="white"
             />
           </div>
@@ -202,7 +217,7 @@ export default function Results() {
                 safe: 'border-brand-green/30 text-brand-green data-[active]:bg-brand-green/15',
                 caution: 'border-brand-yellow/30 text-brand-yellow data-[active]:bg-brand-yellow/15',
                 harmful: 'border-brand-red/30 text-brand-red data-[active]:bg-brand-red/15',
-                unknown: 'border-slate-200 text-slate-500 data-[active]:bg-slate-100',
+                other: 'border-slate-200 text-slate-500 data-[active]:bg-slate-100',
               }
               return (
                 <button

@@ -2,11 +2,11 @@ const RATING_CONFIG = {
   safe:    { label: 'Safe',    emoji: '🟢', cls: 'badge-safe',    dot: 'bg-brand-green' },
   caution: { label: 'Caution', emoji: '🟡', cls: 'badge-caution', dot: 'bg-brand-yellow' },
   harmful: { label: 'Harmful', emoji: '🔴', cls: 'badge-harmful', dot: 'bg-brand-red' },
-  unknown: { label: 'Unknown', emoji: '⚪', cls: 'badge-unknown', dot: 'bg-slate-300' },
+  other: { label: 'Other', emoji: '⚪', cls: 'badge-other', dot: 'bg-slate-300' },
 }
 
 export default function IngredientBadge({ ingredient, expanded = false, onClick }) {
-  const cfg = RATING_CONFIG[ingredient.safety_rating] || RATING_CONFIG.unknown
+  const cfg = RATING_CONFIG[ingredient.safety_rating] || RATING_CONFIG.other
 
   return (
     <button

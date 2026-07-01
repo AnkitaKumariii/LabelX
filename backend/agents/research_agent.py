@@ -101,16 +101,16 @@ async def research_node(state: AnalysisState) -> AnalysisState:
                     await set_tavily_cache(ingredient, parsed)
                 except Exception as e:
                     logger.error(f"Tavily search error for '{ingredient}': {e}")
-                    parsed = _unknown(ingredient, "tavily")
+                    parsed = _other(ingredient, "tavily")
             else:
-                parsed = _unknown(ingredient, "unknown")
+                parsed = _other(ingredient, "other")
 
         progress = 10 + int((idx + 1) / len(ingredients) * 40)
         await _emit(queue, {
             "type": "ingredient_researched",
             "ingredient": ingredient,
             "progress": progress,
-            "safety_rating": parsed.get("safety_rating", "unknown"),
+            "safety_rating": parsed.get("safety_rating", "other"),
         })
         return idx, parsed
 
@@ -126,7 +126,7 @@ async def research_node(state: AnalysisState) -> AnalysisState:
                 "type": "ingredient_researched",
                 "ingredient": ingredient,
                 "progress": progress,
-                "safety_rating": qdrant_res.get("safety_rating", "unknown"),
+                "safety_rating": qdrant_res.get("safety_rating", "other"),
             })
         else:
             fallback_tasks.append(fallback_search(idx, ingredient))
@@ -155,11 +155,11 @@ async def research_node(state: AnalysisState) -> AnalysisState:
     await _emit(queue, {"stage": "research", "status": "done", "duration_sec": time.time() - start_time})
     return {**state, "research_results": final_research_results, "status_updates": updates}
 
-def _unknown(name: str, source: str) -> Dict[str, Any]:
+def _other(name: str, source: str) -> Dict[str, Any]:
     return {
         "name": name,
         "aliases": [],
-        "safety_rating": "unknown",
+        "safety_rating": "other",
         "health_impact": "No data available.",
         "conditions_affected": [],
         "banned_in": [],

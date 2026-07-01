@@ -125,7 +125,7 @@ async def search_ingredients_batch(ingredient_names: List[str]) -> List[Optional
             parsed_results.append({
                 "name": payload.get("name", ingredient_names[i]),
                 "aliases": payload.get("aliases", []),
-                "safety_rating": payload.get("safety_rating", "unknown"),
+                "safety_rating": payload.get("safety_rating", "other"),
                 "health_impact": payload.get("health_impact", "No data."),
                 "conditions_affected": payload.get("conditions_affected", []),
                 "banned_in": payload.get("banned_in", []),
@@ -163,7 +163,7 @@ async def search_ingredient(ingredient_name: str) -> Optional[Dict[str, Any]]:
         return {
             "name": payload.get("name", ingredient_name),
             "aliases": payload.get("aliases", []),
-            "safety_rating": payload.get("safety_rating", "unknown"),
+            "safety_rating": payload.get("safety_rating", "other"),
             "health_impact": payload.get("health_impact", "No data."),
             "conditions_affected": payload.get("conditions_affected", []),
             "banned_in": payload.get("banned_in", []),

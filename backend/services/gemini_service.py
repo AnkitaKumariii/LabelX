@@ -95,14 +95,14 @@ Return a JSON object with exactly these fields:
 {{
   "name": "canonical name",
   "aliases": ["alias1", "alias2"],
-  "safety_rating": "safe|caution|harmful|unknown",
+  "safety_rating": "safe|caution|harmful|other",
   "health_impact": "concise description of health effects",
   "conditions_affected": ["condition1", "condition2"],
   "banned_in": ["country1"],
   "daily_limit_mg": null or number
 }}
 
-If data is insufficient, use "unknown" for safety_rating and empty arrays.
+If data is insufficient, use "other" for safety_rating and empty arrays.
 Respond with ONLY the JSON object."""
 
     response = await _safe_generate(model, prompt)
@@ -118,7 +118,7 @@ Respond with ONLY the JSON object."""
         return {
             "name": ingredient,
             "aliases": [],
-            "safety_rating": "unknown",
+            "safety_rating": "other",
             "health_impact": "Unable to determine from available data.",
             "conditions_affected": [],
             "banned_in": [],
@@ -201,7 +201,7 @@ Generate a comprehensive, personalized food safety report. Return ONLY a valid J
   "ingredients": [
     {{
       "name": "ingredient name",
-      "safety_rating": "safe|caution|harmful|unknown",
+      "safety_rating": "safe|caution|harmful|other",
       "explanation": "explanation in the appropriate language style",
       "personalized_note": "specific note for THIS user's conditions/allergies, or null",
       "banned_in": ["country"],
@@ -213,7 +213,7 @@ Generate a comprehensive, personalized food safety report. Return ONLY a valid J
     "safe_count": 0,
     "caution_count": 0,
     "harmful_count": 0,
-    "unknown_count": 0,
+    "other_count": 0,
     "health_score": 0,
     "top_warnings": ["warning1", "warning2"],
     "allergen_alerts": ["allergen found"],
@@ -225,7 +225,7 @@ Generate a comprehensive, personalized food safety report. Return ONLY a valid J
 }}
 
 SCORING RULES:
-- Start at 100. Each harmful ingredient: -20. Each caution: -8. Each unknown: -3.
+- Start at 100. Each harmful ingredient: -20. Each caution: -8. Each other: -3.
 - Minimum score: 0. Never exceed 100.
 - If 3+ harmful ingredients, score MUST be below 40.
 

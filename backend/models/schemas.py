@@ -38,7 +38,7 @@ class ReportSummary(BaseModel):
     safe_count: int
     caution_count: int
     harmful_count: int
-    unknown_count: int
+    other_count: int
     health_score: int
     top_warnings: List[str]
     allergen_alerts: List[str]

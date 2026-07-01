@@ -100,7 +100,7 @@ body {
   .badge-harmful {
     @apply bg-brand-red/10 border border-brand-red/30 text-rose-600;
   }
-  .badge-unknown {
+  .badge-other {
     @apply bg-slate-100 border border-slate-200 text-slate-500;
   }
 

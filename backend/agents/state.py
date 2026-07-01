@@ -12,7 +12,7 @@ class UserProfile(TypedDict, total=False):
 class IngredientResearch(TypedDict, total=False):
     name: str
     aliases: List[str]
-    safety_rating: str     # "safe" | "caution" | "harmful" | "unknown"
+    safety_rating: str     # "safe" | "caution" | "harmful" | "other"
     health_impact: str
     conditions_affected: List[str]
     banned_in: List[str]
@@ -35,7 +35,7 @@ class ReportSummary(TypedDict, total=False):
     safe_count: int
     caution_count: int
     harmful_count: int
-    unknown_count: int
+    other_count: int
     health_score: int
     top_warnings: List[str]
     allergen_alerts: List[str]
