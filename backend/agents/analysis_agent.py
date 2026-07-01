@@ -43,6 +43,8 @@ async def analysis_node(state: AnalysisState) -> AnalysisState:
             ingredients=state.get("ingredients", []),
             research_results=state.get("research_results", []),
             user_profile=state.get("user_profile", {}),
+            product_veg_status=state.get("product_veg_status", "veg"),
+            processing_level=state.get("processing_level", "unknown"),
             feedback=feedback,
             retry_count=retry_count,
         )

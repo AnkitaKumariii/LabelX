@@ -32,6 +32,10 @@ class IngredientReportItem(BaseModel):
     banned_in: List[str] = []
     daily_limit_mg: Optional[float] = None
     source: str = "qdrant"
+    is_veg: bool = True
+    is_vegan: bool = True
+    ingredient_source: str = "unknown"
+    processing_level: str = "unknown"
 
 
 class ReportSummary(BaseModel):
@@ -44,6 +48,8 @@ class ReportSummary(BaseModel):
     allergen_alerts: List[str]
     personalized_summary: str
     has_disclaimer: bool = False
+    product_veg_status: str = "veg"
+    processing_level: str = "unknown"
 
 
 class AnalysisReportResponse(BaseModel):

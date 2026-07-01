@@ -17,7 +17,7 @@ def get_model():
     global _model
     if _model is None:
         genai.configure(api_key=os.getenv("GEMINI_API_KEY", ""))
-        _model = genai.GenerativeModel("gemini-2.5-flash-lite")
+        _model = genai.GenerativeModel("gemini-3.1-flash-lite")
     return _model
 
 
@@ -130,6 +130,8 @@ async def generate_analysis_report(
     ingredients: List[str],
     research_results: List[Dict[str, Any]],
     user_profile: Dict[str, Any],
+    product_veg_status: str = "veg",
+    processing_level: str = "unknown",
     feedback: Optional[str] = None,
     retry_count: int = 0,
 ) -> Dict[str, Any]:
@@ -160,6 +162,13 @@ async def generate_analysis_report(
     if "pku" in [c.lower() for c in conditions]:
         condition_notes.append(
             "Strongly flag aspartame and any phenylalanine-containing ingredients — DANGEROUS for PKU."
+        )
+
+    dietary_pref = user_profile.get("dietary_preference", "").lower()
+    is_user_veg = "veg" in dietary_pref or "vegan" in dietary_pref or "vegetarian" in dietary_pref
+    if is_user_veg and product_veg_status in ["non-veg", "veg" if "vegan" in dietary_pref else ""]:
+        condition_notes.append(
+            f"CRITICAL WARNING: The user is {dietary_pref} but the product contains non-compliant ingredients! You MUST add a critical warning in top_warnings and clearly state this in the personalized_summary."
         )
 
     language_instruction = (
@@ -206,7 +215,11 @@ Generate a comprehensive, personalized food safety report. Return ONLY a valid J
       "personalized_note": "specific note for THIS user's conditions/allergies, or null",
       "banned_in": ["country"],
       "daily_limit_mg": null or number,
-      "source": "qdrant|tavily|llm"
+      "source": "qdrant|tavily|llm",
+      "is_veg": true/false,
+      "is_vegan": true/false,
+      "ingredient_source": "animal|plant|synthetic|mineral",
+      "processing_level": "ultra_processed|processed|minimally_processed|raw"
     }}
   ],
   "summary": {{
@@ -218,7 +231,9 @@ Generate a comprehensive, personalized food safety report. Return ONLY a valid J
     "top_warnings": ["warning1", "warning2"],
     "allergen_alerts": ["allergen found"],
     "personalized_summary": "2-3 sentence summary specific to this user's health profile",
-    "has_disclaimer": false
+    "has_disclaimer": false,
+    "product_veg_status": "{product_veg_status}",
+    "processing_level": "{processing_level}"
   }},
   "disclaimer": null,
   "expertise_level": "{expertise}"
@@ -307,6 +322,7 @@ Validate the following 6 gates (yes/no):
 4. Personalization: Does the summary or personalized_note explicitly mention/address the user's health conditions?
 5. Relevance: Is this report actually evaluating food? (Confirm it's not analyzing shampoo, etc.)
 6. Clarity: Is the report free of overly complex, unexplained scientific jargon (suitable for beginner)?
+7. Dietary Compliance Check: If the user's profile indicates they are vegetarian or vegan, AND the product_veg_status or any ingredient is non-veg/non-vegan, is there a CRITICAL WARNING in the top_warnings or personalized_summary about this? (If user is not veg/vegan, or product is compliant, return true).
 
 Respond with ONLY a JSON object exactly like this:
 {{
@@ -316,7 +332,8 @@ Respond with ONLY a JSON object exactly like this:
     "score_consistency": true/false,
     "personalization": true/false,
     "relevance": true/false,
-    "clarity": true/false
+    "clarity": true/false,
+    "dietary_compliance": true/false
   }},
   "failures": ["If any gate is false, list the specific reason why it failed here"]
 }}"""

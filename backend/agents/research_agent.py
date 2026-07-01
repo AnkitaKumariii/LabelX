@@ -12,6 +12,71 @@ logger = logging.getLogger(__name__)
 
 CONFIDENCE_THRESHOLD = 0.7
 
+# ── Rule-Based Classifications ────────────────────────────────────────────────
+
+NON_VEG_RULES = {
+    "gelatin": {"reason": "pig/cow bones", "source": "animal"},
+    "e441": {"reason": "pig/cow bones (gelatin)", "source": "animal"},
+    "carmine": {"reason": "crushed beetles", "source": "animal (insect)"},
+    "e120": {"reason": "crushed beetles (carmine)", "source": "animal (insect)"},
+    "lard": {"reason": "pig fat", "source": "animal"},
+    "isinglass": {"reason": "fish bladder", "source": "animal (fish)"},
+    "l-cysteine": {"reason": "duck feathers/human hair", "source": "animal"},
+    "e920": {"reason": "duck feathers (l-cysteine)", "source": "animal"},
+    "rennet": {"reason": "calf enzyme", "source": "animal"},
+    "shellac": {"reason": "insect secretion", "source": "animal (insect)"},
+    "e904": {"reason": "insect secretion (shellac)", "source": "animal (insect)"},
+    "omega-3": {"reason": "often fish-derived", "source": "animal (fish)"},
+    "vitamin d3": {"reason": "sheep wool (lanolin)", "source": "animal (sheep)"},
+}
+
+NON_VEGAN_RULES = {
+    "casein": {"reason": "milk protein", "source": "animal (dairy)"},
+    "whey": {"reason": "milk", "source": "animal (dairy)"},
+    "lactose": {"reason": "milk sugar", "source": "animal (dairy)"},
+    "egg": {"reason": "egg", "source": "animal (egg)"},
+    "albumen": {"reason": "egg white", "source": "animal (egg)"},
+    "honey": {"reason": "bee secretion", "source": "animal (insect)"},
+    "beeswax": {"reason": "bee secretion", "source": "animal (insect)"},
+    "e901": {"reason": "bee secretion (beeswax)", "source": "animal (insect)"},
+}
+
+def classify_veg(ingredient_name: str) -> Dict[str, Any]:
+    name_lower = ingredient_name.lower().strip()
+    
+    # Check non-veg
+    for key, data in NON_VEG_RULES.items():
+        if key in name_lower:
+            return {"is_veg": False, "is_vegan": False, "reason": data["reason"], "source": data["source"]}
+            
+    # Check non-vegan
+    for key, data in NON_VEGAN_RULES.items():
+        if key in name_lower:
+            return {"is_veg": True, "is_vegan": False, "reason": data["reason"], "source": data["source"]}
+            
+    return {"is_veg": True, "is_vegan": True, "reason": None, "source": "plant/synthetic/mineral"}
+
+def classify_processing(ingredient_name: str) -> str:
+    name = ingredient_name.lower().strip()
+    
+    ultra = ["artificial", "synthetic", "hydrogenated", "color", "red 40", "yellow 5", "blue 1", "e1", "e2", "e3", "e4", "e5", "e6", "e9"]
+    processed = ["maltodextrin", "starch", "syrup", "isolate", "refined", "extract", "concentrate", "powder"]
+    
+    if any(u in name for u in ultra):
+        return "ultra_processed"
+    if any(p in name for p in processed):
+        return "processed"
+    if any(r in name for r in ["turmeric", "salt", "sugar", "water", "spice", "oil"]):
+        return "raw"
+        
+    return "minimally_processed"
+
+def get_worst_processing_level(levels: List[str]) -> str:
+    if "ultra_processed" in levels: return "ultra_processed"
+    if "processed" in levels: return "processed"
+    if "minimally_processed" in levels: return "minimally_processed"
+    return "raw"
+
 
 async def _emit(queue, event: dict) -> None:
     if queue:
@@ -144,6 +209,41 @@ async def research_node(state: AnalysisState) -> AnalysisState:
         "message": f"Research complete — {len(final_research_results)} ingredients processed",
         "progress": 50,
     })
+    
+    # 3. Apply Rule-Based Classifications
+    product_is_veg = True
+    product_is_vegan = True
+    non_veg_ingredients = []
+    processing_levels = []
+    
+    for res in final_research_results:
+        veg_info = classify_veg(res["name"])
+        res["is_veg"] = veg_info["is_veg"]
+        res["is_vegan"] = veg_info["is_vegan"]
+        res["ingredient_source"] = veg_info["source"]
+        
+        proc_level = classify_processing(res["name"])
+        res["processing_level"] = proc_level
+        processing_levels.append(proc_level)
+        
+        if not veg_info["is_veg"]:
+            product_is_veg = False
+            product_is_vegan = False
+            non_veg_ingredients.append({
+                "name": res["name"],
+                "reason": veg_info["reason"],
+                "source": veg_info["source"]
+            })
+        elif not veg_info["is_vegan"]:
+            product_is_vegan = False
+            
+    overall_processing = get_worst_processing_level(processing_levels)
+    if not product_is_veg:
+        product_veg_status = "non-veg"
+    elif not product_is_vegan:
+        product_veg_status = "veg"
+    else:
+        product_veg_status = "vegan"
 
     updates = list(state.get("status_updates", []))
     updates.append({
@@ -153,7 +253,14 @@ async def research_node(state: AnalysisState) -> AnalysisState:
     })
 
     await _emit(queue, {"stage": "research", "status": "done", "duration_sec": time.time() - start_time})
-    return {**state, "research_results": final_research_results, "status_updates": updates}
+    return {
+        **state, 
+        "research_results": final_research_results, 
+        "status_updates": updates,
+        "product_veg_status": product_veg_status,
+        "non_veg_ingredients": non_veg_ingredients,
+        "processing_level": overall_processing
+    }
 
 def _other(name: str, source: str) -> Dict[str, Any]:
     return {
@@ -166,4 +273,8 @@ def _other(name: str, source: str) -> Dict[str, Any]:
         "daily_limit_mg": None,
         "source": source,
         "confidence": 0.0,
+        "is_veg": True,
+        "is_vegan": True,
+        "ingredient_source": "unknown",
+        "processing_level": "unknown"
     }
