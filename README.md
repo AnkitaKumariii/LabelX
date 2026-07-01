@@ -17,7 +17,7 @@ LabelX is a full-stack web application that uses a **multi-agent LangGraph workf
 | **Live Streaming** | Server-Sent Events show real-time agent progress |
 | **Vector Search** | Qdrant + FastEmbed for 70+ ingredient embeddings |
 | **Web Fallback** | Tavily search for unknown ingredients |
-| **OCR** | Upload product photos → Tesseract extracts text |
+| **OCR** | Upload product photos → Gemini Vision extracts text |
 | **Color-Coded Results** | 🔴 Harmful / 🟡 Caution / 🟢 Safe badges |
 | **Health Score Gauge** | 0–100 animated score with condition-aware scoring |
 
@@ -46,9 +46,8 @@ Redis Cloud           — profile & history storage (Keyed by Google ID)
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.12 (via `runtime.txt`)
 - Node.js 18+
-- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) installed on your system
 - Qdrant Cloud account → [cloud.qdrant.io](https://cloud.qdrant.io)
 - Redis Cloud account → [redis.com/try-free](https://redis.com/try-free)
 - Gemini API key → [aistudio.google.com](https://aistudio.google.com)
@@ -154,7 +153,7 @@ After 3 failures → returns best-effort report with disclaimer.
 ### Backend → Render
 1. Connect GitHub repo to Render
 2. Root directory: `backend`
-3. Build command auto-installs Tesseract (see `render.yaml`)
+3. Render uses `render.yaml` to configure Python 3.12 and install dependencies
 4. Set all env vars in Render dashboard
 5. Set `FRONTEND_URL` to your Vercel app URL
 
@@ -187,7 +186,7 @@ LabelX/
 │   └── services/
 │       ├── redis_service.py     # Profile & history storage
 │       ├── qdrant_service.py    # Vector search with FastEmbed
-│       ├── ocr_service.py       # Tesseract OCR
+│       ├── ocr_service.py       # Gemini Vision OCR
 │       ├── gemini_service.py    # LLM helpers
 │       └── seed_qdrant.py       # Database seeder (run once)
 │   └── scripts/
