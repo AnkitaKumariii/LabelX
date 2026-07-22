@@ -141,7 +141,6 @@ export default function ProfileSetup() {
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={() => setError('Login Failed')}
-                useOneTap
                 theme="filled_blue"
                 shape="pill"
               />
