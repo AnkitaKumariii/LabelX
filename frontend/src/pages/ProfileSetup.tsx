@@ -51,7 +51,9 @@ export default function ProfileSetup() {
     }
   }, [])
 
-  const handleGoogleSuccess = async (credentialResponse) => {
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setLoading(true)
+    setError(null)
     try {
       const profile = await verifyGoogleToken(credentialResponse.credential)
       localStorage.setItem('labelx_google_id', profile.profile_id)
@@ -67,12 +69,14 @@ export default function ProfileSetup() {
       if (profile.health_conditions.length > 0 || profile.allergies.length > 0) {
         navigate('/analyze')
       }
-    } catch (err) {
-      setError('Google Login failed.')
+    } catch (err: any) {
+      setError('Google Login failed. Please try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
-  const toggleCondition = (id) => {
+  const toggleCondition = (id: string) => {
     setForm(f => ({
       ...f,
       health_conditions: f.health_conditions.includes(id)
@@ -81,7 +85,7 @@ export default function ProfileSetup() {
     }))
   }
 
-  const addAllergen = (allergen) => {
+  const addAllergen = (allergen: string) => {
     const trimmed = allergen.trim()
     if (!trimmed) return
     const lower = trimmed.toLowerCase()
@@ -91,7 +95,7 @@ export default function ProfileSetup() {
     setAllergyInput('')
   }
 
-  const removeAllergen = (allergen) => {
+  const removeAllergen = (allergen: string) => {
     setForm(f => ({ ...f, allergies: f.allergies.filter(a => a !== allergen) }))
   }
 
@@ -108,7 +112,7 @@ export default function ProfileSetup() {
       }
       localStorage.setItem('labelx_google_id', profile.profile_id)
       navigate('/analyze')
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Failed to save profile')
     } finally {
       setLoading(false)
@@ -127,15 +131,22 @@ export default function ProfileSetup() {
           <h1 className="text-3xl font-bold font-display mb-3 text-slate-900">Welcome to LabelX</h1>
           <p className="text-slate-500 mb-8">Sign in with Google to securely store your health profile and analysis history.</p>
           
-          <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError('Login Failed')}
-              useOneTap
-              theme="filled_blue"
-              shape="pill"
-            />
-          </div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center space-y-4 py-4">
+              <div className="w-10 h-10 border-4 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-sm font-medium text-slate-600 animate-pulse">Authenticating & loading profile...</p>
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError('Login Failed')}
+                useOneTap
+                theme="filled_blue"
+                shape="pill"
+              />
+            </div>
+          )}
           {error && <p className="text-brand-red mt-4 text-sm font-medium">{error}</p>}
         </div>
       </div>

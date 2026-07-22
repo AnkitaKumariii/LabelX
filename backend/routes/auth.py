@@ -1,4 +1,5 @@
 import os
+import asyncio
 from fastapi import APIRouter, HTTPException
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -15,14 +16,16 @@ GOOGLE_CLIENT_ID = os.getenv("VITE_GOOGLE_CLIENT_ID")
 async def google_auth(request: GoogleAuthRequest):
     """Verify Google token and return or create the user profile in Redis."""
     try:
-        # Verify the token
-        # If GOOGLE_CLIENT_ID is not set or placeholder, we skip strict audience check
-        # But in a real app, it should strictly match the client ID.
+        # Verify the token asynchronously in worker thread to prevent blocking FastAPI event loop
         if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_ID != "YOUR_GOOGLE_CLIENT_ID_HERE":
-            idinfo = id_token.verify_oauth2_token(request.token, requests.Request(), GOOGLE_CLIENT_ID)
+            idinfo = await asyncio.to_thread(
+                id_token.verify_oauth2_token, request.token, requests.Request(), GOOGLE_CLIENT_ID
+            )
         else:
             # Only for local dev if client ID isn't set securely, though google-auth still verifies signature
-            idinfo = id_token.verify_oauth2_token(request.token, requests.Request())
+            idinfo = await asyncio.to_thread(
+                id_token.verify_oauth2_token, request.token, requests.Request()
+            )
 
         user_id = idinfo['sub']
         name = idinfo.get('name', 'User')
